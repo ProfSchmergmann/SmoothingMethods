@@ -1,0 +1,32 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: September 13, 2023
+output: pdf_document
+---
+
+## Example:
+Generate sample of $n=5$ points from $\mathcal{N}(0,1)$.
+``ecdf(x)`` creates an "object" that represents $F_n(t)$.
+The $\mathcal{N}(0,1)$ distribution function $F(t)$ is ``pnorm(t)``.
+To plot this we create a grid of values of $t$ and evaluate and evaluate ``pnorm()`` at that grid.
+```{r}
+x <- rnorm(n = 5)
+plot(x = ecdf(x))
+t <- seq(from = -5, to = 5, length.out = 20)
+plot(t, pnorm(t))
+t <- seq(from = -5, to = 5, length.out = 200)
+plot(t, pnorm(t))
+plot(t, pnorm(t), type = "l")
+lines(t, pnorm(t))
+x <- rnorm(n = 20)
+plot(x = ecdf(x))
+lines(t, pnorm(t), col = "red")
+x <- rnorm(n = 100)
+plot(x = ecdf(x))
+lines(t, pnorm(t), col = "red")
+x <- rnorm(n = 500)
+plot(x = ecdf(x))
+lines(t, pnorm(t), col = "red")
+
+```

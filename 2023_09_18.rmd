@@ -1,0 +1,29 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: September 18, 2023
+output: pdf_document
+---
+
+```{r}
+1 - pbinom(q = 12, size = 20, prob = 0.5)
+```
+```{r}
+powerf1 <- function(p) {
+  return(1 - pbinom(q = 14, size = 20, prob = p))
+}
+powerf1(0.1)
+powerf1(0.5)
+powerf1(0.7)
+p <- seq(0, 1, length.out = 100)
+plot(p, powerf1(p))
+plot(p, powerf1(p), type = "l")
+```
+```{r}
+source("binomial_powerf.R")
+plot(p, powerf(n = 20, p), type = "l")
+lines(p, powerf(n = 20, p), col = "red")
+abline(v = 0.5)
+lines(p, powerf(n = 50, p), col = "blue")
+lines(p, powerf(n = 500, p), col = "green")
+```

@@ -41,18 +41,18 @@ To be able to know the exact value for $r$, we need to create a vector from 1 to
 ```{r}
 numbers <- seq_along(sorted_vals)
 ```
-Then we are going to check for $$P(T \leq X) \geq 0.9$$ with $$T \sim B(X, 0.8)$$.
+Then we are going to check for $$P(T \leq r-1) \geq 0.9$$ with $$T \sim B(X, 0.8).$$
 ```{r}
 first_over_ninety_index <- which(pbinom(numbers, size = 24, prob = p) >= 1 - alpha)[1]
-cat('The index of the first element that is over ', p, '%, is', first_over_ninety_index, '.')
+cat('The index of the first element that is over ', p * 100, '%, is', first_over_ninety_index, '.')
 # get the actual value for this element
 first_over_ninety <- sorted_vals[first_over_ninety_index]
 pbinom(q = first_over_ninety_index + 1, size = 24, prob = 0.8)
 ```
-Now we take $r-1$ to obtain the index of the searched element.
+Now we take $r+1$ to obtain the index of the searched element.
 ```{r}
 r <- first_over_ninety_index - 1
-cat('With ', 1 - alpha, '% confidence we can say that the lower bound of the', p * 100, 'th quantile starts at x =', sorted_vals[first_over_ninety_index], '.')
+cat('With ', (1 - alpha) * 100, '% confidence we can say that the upper bound of the', p * 100, 'th quantile starts at x =', sorted_vals[first_over_ninety_index], '.')
 ```
 
 ## 5.10
@@ -64,12 +64,12 @@ How large must the sample be in order to have $95\%$ confidence that at least $9
 ### Solution
 
 We are searching for two values $X_{(n-1)}$ and $X_n$ for $n$ such that
-$$ P(T\leq X) \geq 0.95 $$ with $$ T \sim B(X,0.9). $$
+$$ P(T\leq r-1) \geq 0.95 $$ with $$ T \sim B(X,0.9). $$
 
 ```{r}
 for (n in 1:1000) {
-  if (length(which(pbinom(1:n, size = n, prob = 0.9) >= 0.95)) == 2) {
-    cat('The sample must be greater or equal to', n, '.')
+  if (length(which(pbinom(1:n, size = n, prob = 0.9) >= 0.95)) == 3) {
+    cat('The sample size must be greater or equal to', n, '.')
     break
   }
 }

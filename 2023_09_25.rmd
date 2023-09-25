@@ -1,0 +1,15 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: September 25, 2023
+output: pdf_document
+---
+
+```{r}
+mu <- seq(-2, 2, length.out = 50)
+source('sign_test_power.R')
+plot(mu, pi_norm(mu, n = 5, alpha = 0.1))
+plot(mu, pi_norm(mu, n = 5, alpha = 0.1), type = 'l')
+abline(v = 0)
+lines(mu, pi_sign(mu, n = 5, alpha = 0.1), col = 'red')
+```

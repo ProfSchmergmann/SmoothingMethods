@@ -51,7 +51,7 @@ pbinom(q = first_over_ninety_index + 1, size = 24, prob = 0.8)
 ```
 Now we take $r+1$ to obtain the index of the searched element.
 ```{r}
-r <- first_over_ninety_index - 1
+r <- first_over_ninety_index + 1
 cat('With ', (1 - alpha) * 100, '% confidence we can say that the upper bound of the', p * 100, 'th quantile starts at x =', sorted_vals[first_over_ninety_index], '.')
 ```
 
@@ -78,11 +78,12 @@ for (n in 1:1000) {
 
 ### Problem
 Find a $90\%$ upper tolerance interval for the 99th percentile of a sample of size $n=1000$.
+The interval is half open because we searched for $r-1$ so leaving the first element out delivers an interval starting from $r$.
 
 ### Solution
 ```{r}
 n <- 1000
 p <- 0.99
 alpha <- 0.1
-cat('The intervall is: [', which(pbinom(q = 1:n, size = n, prob = p) >= 1 - alpha), ']')
+cat('The intervall is: (', which(pbinom(q = 1:n, size = n, prob = p) >= 1 - alpha), ']')
 ```

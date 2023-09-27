@@ -1,7 +1,7 @@
 ---
 title: "Assignment 1"
 author: Sven Bergmann
-date: September 21, 2023
+date: September 26, 2023
 output: pdf_document
 ---
 
@@ -27,7 +27,12 @@ To verify if the data can represent the visual acuity of the general population,
 ### Solution
 
 We want to have a $90\%$ upper tolerance bound for the 80th quantile.
-So $$ n = 24, p = 0.8, 1 - \alpha = 0.9 \Leftrightarrow \alpha = 0.1.$$
+The upper bound is going to be $X_{r}$ for some $r$.
+So
+$$ n = 24, p = 0.8, 1 - \alpha = 0.9 \Leftrightarrow \alpha = 0.1. $$
+and we are looking for
+$$ P(X_{0.8} \leq X_{(r)}) \geq 1 - \alpha $$
+with
 ```{r}
 n <- 24
 p <- 0.8
@@ -35,24 +40,24 @@ alpha <- 0.1
 ```
 The sorted values are:
 ```{r}
-sorted_vals <- sort(c(20, 20, 20, 25, 15, 30, 25, 20, 25, 80, 30, 25, 30, 50, 30, 20, 15, 20, 25, 16, 30, 15, 15, 25))
+values_sorted <- sort(c(20, 20, 20, 25, 15, 30, 25, 20, 25, 80, 30, 25, 30, 50, 30, 20, 15, 20, 25, 16, 30, 15, 15, 25))
 ```
 To be able to know the exact value for $r$, we need to create a vector from 1 to the length of the values:
 ```{r}
-numbers <- seq_along(sorted_vals)
+numbers <- seq_along(values_sorted)
 ```
-Then we are going to check for $$P(T \leq r-1) \geq 0.9$$ with $$T \sim B(X, 0.8).$$
+Since
+$$P(X_{0.8} \leq X_{(r)}) \Leftrightarrow P(T \leq r -1)$$
+with
+$$T \sim B(X,0.8),$$
+we are going to check for
+$$P(T \leq r-1) \geq 0.9.$$
+
+The first element that fulfills $P(T \leq r-1) \geq 0.9$ would be $X_{(r-1)}$, so in order to find $X_{(r)}$, we need to take the second element.
 ```{r}
-first_over_ninety_index <- which(pbinom(numbers, size = 24, prob = p) >= 1 - alpha)[1]
-cat('The index of the first element that is over ', p * 100, '%, is', first_over_ninety_index, '.')
-# get the actual value for this element
-first_over_ninety <- sorted_vals[first_over_ninety_index]
-pbinom(q = first_over_ninety_index + 1, size = 24, prob = 0.8)
-```
-Now we take $r+1$ to obtain the index of the searched element.
-```{r}
-r <- first_over_ninety_index + 1
-cat('With ', (1 - alpha) * 100, '% confidence we can say that the upper bound of the', p * 100, 'th quantile starts at x =', sorted_vals[first_over_ninety_index], '.')
+pbinom_vals <- pbinom(numbers, size = n, prob = p)
+upper_bound <- values_sorted[which(pbinom_vals >= 1 - alpha)[2]]
+cat("The 90% upper tolerance bound is", upper_bound, "\n")
 ```
 
 ## 5.10
@@ -63,8 +68,12 @@ How large must the sample be in order to have $95\%$ confidence that at least $9
 
 ### Solution
 
-We are searching for two values $X_{(n-1)}$ and $X_n$ for $n$ such that
-$$ P(T\leq r-1) \geq 0.95 $$ with $$ T \sim B(X,0.9). $$
+Here we have
+$$ p=0.9, 1- \alpha = 0.95 \Leftrightarrow \alpha = 0.05. $$
+With the same reasoning as above in Problem 5, we are searching for two values $X_{(n-1)}$ and $X_n$ for $n$ such that
+$$ P(T\leq r-1) \geq 0.95 $$
+with
+$$ T \sim B(X,0.9). $$
 
 ```{r}
 for (n in 1:1000) {
@@ -78,9 +87,15 @@ for (n in 1:1000) {
 
 ### Problem
 Find a $90\%$ upper tolerance interval for the 99th percentile of a sample of size $n=1000$.
-The interval is half open because we searched for $r-1$ so leaving the first element out delivers an interval starting from $r$.
 
 ### Solution
+With the same reasoning as above we are searching for all the values such that
+$$P(T \leq r-1) \geq 0.9$$
+with
+$$T \sim (X,0.99)$$
+The interval is half open because we searched for $r-1$ so leaving the first element out delivers an interval starting from $X_{(r)}$.
+
+
 ```{r}
 n <- 1000
 p <- 0.99

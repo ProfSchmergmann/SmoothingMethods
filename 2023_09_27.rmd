@@ -1,0 +1,18 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: September 27, 2023
+output: pdf_document
+---
+```{r}
+sc1 <- c(86, 71, 77, 68, 91, 72, 77, 91, 70, 71, 88, 87)
+sc2 <- c(88, 77, 76, 64, 96, 72, 65, 90, 65, 80, 81, 72)
+D <- sc1 - sc2
+hist(D)
+```
+```{r}
+wilcox.test(x=D, alternative = 'greater')
+```
+```{r}
+t.test(x=D, alternative = 'greater')
+```

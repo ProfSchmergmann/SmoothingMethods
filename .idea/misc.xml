@@ -2,7 +2,7 @@
 <project version="4">
   <component name="Black">
     <option name="enabledOnReformat" value="true" />
-    <option name="sdkUUID" value="336c6730-52e3-44c7-94b8-9bd4ff3ac34b" />
+    <option name="sdkName" value="C:\Users\sberg\anaconda3" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="C:\Users\sberg\anaconda3" project-jdk-type="Python SDK" />
   <component name="RMarkdownSettings">
@@ -40,6 +40,13 @@
           </value>
         </entry>
         <entry key="file://$PROJECT_DIR$/2023_09_27.rmd">
+          <value>
+            <RMarkdownRenderProfile>
+              <option name="outputDirectoryUrl" value="file://$PROJECT_DIR$" />
+            </RMarkdownRenderProfile>
+          </value>
+        </entry>
+        <entry key="file://$PROJECT_DIR$/2023_10_04.rmd">
           <value>
             <RMarkdownRenderProfile>
               <option name="outputDirectoryUrl" value="file://$PROJECT_DIR$" />

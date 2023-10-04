@@ -1,0 +1,20 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: October 04, 2023
+output: pdf_document
+---
+```{r}
+source('sign_test_power.R')
+mu <- seq(-2, 2, length.out = 200)
+plot(mu, pi_norm(mu, n = 50, alpha = 0.1), type = 'l', col = 'red', lwd = 2)
+lines(mu, pi_sign(mu, n = 50, alpha = 0.1), type = 'l', col = 'blue', lwd = 2)
+abline(v = 0)
+```
+```{r}
+source('wilc_test_power.R')
+print(pi_wilc(m = 0, n = 50, alpha = 0.1))
+```
+```{r}
+plot(mu, sapply(mu, pi_wilc, n=50, alpha = 0.1), col='green', lwd=2)
+```

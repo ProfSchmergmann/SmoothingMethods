@@ -120,7 +120,6 @@ means
 Yes, the median time does prove to be greater for the NV group.
 
 
-
 \vspace{10mm}
 
 \subsection{Problem 7}

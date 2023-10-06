@@ -1,10 +1,7 @@
 ---
-title: "HW2 - Lucas Fellmeth"
+title: "HW2 - Lucas Fellmeth, Sven Bergmann"
 date: "2023-10-05"
-output:
-  pdf_document: default
-  html_document:
-    df_print: paged
+output: pdf_document
 latex_engine: xelatex
 ---
 
@@ -14,131 +11,122 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 
-\section{Chapter 7}
-\vspace{10mm}
-\subsection{Problem 3}
-\vspace{5mm}
+# Chapter 7
 
-Diet A was given to a group of 10 overweight boys between the ages of 8
-and 10. Diet B was given to another independent group of 8 similar overweight
-boys. The weight loss is given in the table below. Using WMW test,
-test the hypothesis that the diets are of comparable effectiveness against
-the two-sided alternative. Use $\alpha = 5\%$ and normal approximation
+## Problem 3
 
-Diet A 7 2 3 -1 4 6 0 1 4 6 \newline
-Diet B 5 6 4 7 8 9 7 2
+Diet A was given to a group of 10 overweight boys between the ages of 8 and 10.
+Diet B was given to another independent group of 8 similar overweight boys.
+The weight loss is given in the table below.
+Using WMW test, test the hypothesis that the diets are of comparable effectiveness against the two-sided alternative.
+Use $\alpha = 5\%$ and normal approximation.
 
-\subsection{Solution}
-\vspace{5mm}
+|        |   |   |   |    |   |   |   |   |   |   |
+|--------|---|---|---|----|---|---|---|---|---|---|
+| Diet A | 7 | 2 | 3 | -1 | 4 | 6 | 0 | 1 | 4 | 6 |
+| Diet B | 5 | 6 | 4 | 7  | 8 | 9 | 7 | 2 |   |   |
 
-We test for $H_0 : F_A(x) = F_B(x)$ 
+### Solution
 
-First we find 
-\[ W_n =\sum_{n=1}^{n_1} R_i \] 
+We test for $H_0 : F_A(x) = F_B(x)$.
 
-We reject when $W_n \geq k_{0.05}$
+First we find
+$$W_n =\sum_{n=1}^{n_1} R_i$$
 
-\vspace{5mm}
+We reject when $W_n \geq k_{0.05}$.
+
 ```{r}
-rm(list=ls())
-a <- c(7,2,3,-1,4,6,0,1,4,6)
-b <- c(5,6,4,7,8,9,7,2)
+#rm(list=ls())
+a <- c(7, 2, 3, -1, 4, 6, 0, 1, 4, 6)
+b <- c(5, 6, 4, 7, 8, 9, 7, 2)
 
 n_1 <- length(a)
 n_2 <- length(b)
-c <- c(a,b)
+c <- c(a, b)
 n <- length(c)
 rnk <- rank(c)
 W_n <- sum(rnk[1:n_1]) # sum of the ranks of a
-U <- W_n-(n_1*(n_1+1)/2)
-
-```
-\vspace{5mm}
-
-Since there are ties in the ranks $$W_n \sim \mathcal{N} \left( \frac{n_1(n+1)}{2}, \frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)} \right)$$ 
-where $t_1, \ldots,t_k$ are the number of different observations among all
-the observations in the combined sample. \newline
-
-We reject if $$\frac{W_n -\frac{n_1(n+1)}{2}}{\sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}}} > z_{0.05} \Leftrightarrow W_n  > z_a +\frac{n_1(n+1)}{2}* \left( \sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}} \right)$$
-
-```{r}
-
-t_sum = 0
-t = tabulate(rnk)
-t = t[t!=0]
+U <- W_n - (n_1 * (n_1 + 1) / 2)
 ```
 
+Since there are ties in the ranks
+$$W_n \sim \mathcal{N} \left(
+\frac{n_1(n+1)}{2},
+\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}
+\right)$$
+where $t_1, \ldots,t_k$ are the number of different observations among all the observations in the combined sample.
+
+
+We reject if
+\begin{align*}
+\frac{W_n -\frac{n_1(n+1)}{2}}{\sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}}} &> z_{0.05} \\
+\Leftrightarrow W_n  &> z_{0.05} +\frac{n_1(n+1)}{2}* \left( \sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}} \right)
+\end{align*}
+
 ```{r}
+t <- tabulate(rnk)
+t <- t[t != 0]
+t_sum <- sum(t^3 - t)
 
-t_sum = 0
-
-for (i in 1:length(t)) {
-  
-  t_sum = t_sum + (t[i]^3-t[i])
-  
-}
-
-lower = (1-pnorm(0.05))*(n_1*(n+1)/2)*sqrt(n_1*n_2*(n+1)/12 - n_1*n_2*t_sum/(12*n*(n+1)))
-
+lower <- (1 - pnorm(0.05)) *
+  (n_1 * (n + 1) / 2) *
+  sqrt(n_1 * n_2 * (n + 1) / 12 - n_1 * n_2 * t_sum / (12 * n * (n + 1)))
 ```
 
+## Problem 6
 
-\vspace{10mm}
+Use the link below to see the results of an experiment on the effect of prior information
+on the time to fuse random dot stereograms.
+One group (NV) was given either no information or just verbal information about the shape of the embedded object.
+A second group (VV) received both verbal information and visual information (e.g. a drawing of the object).
+Does the median time prove to be greater for the NV group?
+Compare your results to those from a two-sample t-test.
 
-\subsection{Problem 6}
-\vspace{5mm}
+### Solution
 
-Use the link below to see the results of an experiment on the effect of prior
-information on the time to fuse random dot stereograms. One group (NV)
-was given either no information or just verbal information about the shape
-of the embedded object. A second group (VV) received both verbal information
-and visual information (e.g. a drawing of the object). Does the median
-time prove to be greater for the NV group? Compare your results to those
-from a two-sample t-test.
-
-\subsection{Solution}
-
-This time, our null hypothesis is: $H_0:\mu_{NV}^2 = \mu_{VV}^2$ vs $H_1:\mu_{NV}^2 >\mu_{VV}^2$
-
-
-
-\vspace{5mm}
+This time, our null hypothesis is:
+$$H_0:\mu_{NV}^2 = \mu_{VV}^2 \text{ vs } H_1:\mu_{NV}^2 >\mu_{VV}^2$$
 
 ```{r}
-rm(list=ls())
+#rm(list = ls())
 stereogram_data <- read.delim2("stereograms.txt")
 stereogram_data$fusion.time <- as.numeric(stereogram_data$fusion.time)
 stereogram_data$group <- factor(stereogram_data$group)
 table(stereogram_data$group) # we have n_1 and n_2 > 10
 #means <- with(stereogram_data, tapply(fusion.time, group, mean))
-means <- aggregate(fusion.time ~group,stereogram_data,mean)
-means 
+means <- aggregate(fusion.time ~ group, stereogram_data, mean)
+print(means)
 
 ```
-\vspace{10mm}
-
 Yes, the median time does prove to be greater for the NV group.
 
+```{r}
 
-\vspace{10mm}
+t.test(subset(stereogram_data, subset = (group =="NV"))$fusion.time , subset(stereogram_data, subset = (group =="VV"))$fusion.time, alternative = "greater", var.equal = FALSE)
 
-\subsection{Problem 7}
-\vspace{5mm}
+```
 
-Derive the exact distribution of the Mann–Whitney U statistic in the case
-that $n_1 = 4$ and $n_2 = 2.$
+The two-sample t-test confirms our observation.
 
-\subsection{Solution}
-\vspace{5mm}
+# Problem 7
 
-The exact distribution can be found as 
-$$
-  P(W_n = m) = \frac{k_{n_1,n_2}(m)}{\left( \begin{array}{c} n \\ n_1 \end{array} \right)}, \frac{n_1(n_1+1)}{2} \leq m \leq \frac{n_1(2n -n_1 +1)}{2}
-$$
+Derive the exact distribution of the Mann–Whitney U statistic in the case that $n_1 = 4$ and $n_2 = 2$.
 
-with $k_{n_1,n_2} (m)$ the number of all arrangements of zeroes and ones in $(S_1(X,Y), \ldots, S_n(X,Y))$ such that $W_n =\sum_{i=1}^n iS_i(X,Y) = m.$
+## Solution
 
-We have $$n_1 =4, n_2= 2, n = n_1 +n_2 = 6$$ so there are $\left( \begin{array}{c} 6 \\ 4\end{array} \right) = \left( \begin{array}{c} 6 \\ 2 \end{array} \right) = 15$ distinguishable configurations of the vector $(S_1, S_2,\ldots, S_6).$ \newline The minimum of $W_6$ is $10$ and the maximum is $18$.
+The exact distribution can be found as
+$$P(W_n = m) = \frac{k_{n_1,n_2}(m)}{\left( \begin{array}{c} n \\ n_1 \end{array} \right)}, \frac{n_1(n_1+1)}{2} \leq m \leq \frac{n_1(2n -n_1 +1)}{2}$$
+
+with $k_{n_1,n_2} (m)$ the number of all arrangements of zeroes and ones in $(S_1(X,Y), \ldots, S_n(X,Y))$
+such that $W_n =\sum_{i=1}^n iS_i(X,Y) = m$.
+
+We have
+$$n_1 =4, n_2= 2, n = n_1 +n_2 = 6$$
+so there are $\left( \begin{array}{c} 6 \\ 4\end{array} \right) = \left( \begin{array}{c} 6 \\ 2 \end{array} \right) = 15$ distinguishable configurations of the vector $(S_1, S_2,\ldots, S_6)$.
+
+
+The minimum of $W_6$ is $10$ and the maximum is $18$.
+
 
 Then we get the following distribution:
 

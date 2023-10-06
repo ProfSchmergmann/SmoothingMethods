@@ -4,7 +4,7 @@
     <option name="enabledOnReformat" value="true" />
     <option name="sdkName" value="C:\Users\sberg\anaconda3" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="C:\Users\sberg\anaconda3" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10" project-jdk-type="Python SDK" />
   <component name="RMarkdownSettings">
     <option name="renderProfiles">
       <map>
@@ -56,6 +56,14 @@
         <entry key="file://$PROJECT_DIR$/Assignment_1.rmd">
           <value>
             <RMarkdownRenderProfile>
+              <option name="outputDirectoryUrl" value="file://$PROJECT_DIR$" />
+            </RMarkdownRenderProfile>
+          </value>
+        </entry>
+        <entry key="file://$PROJECT_DIR$/HW2.Rmd">
+          <value>
+            <RMarkdownRenderProfile>
+              <option name="lastOutput" value="$PROJECT_DIR$/HW2.pdf" />
               <option name="outputDirectoryUrl" value="file://$PROJECT_DIR$" />
             </RMarkdownRenderProfile>
           </value>

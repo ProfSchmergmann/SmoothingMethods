@@ -1,0 +1,35 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: October 09, 2023
+output: pdf_document
+---
+```{r}
+y_surf <- c(2.96, 3.00, 3.12, 3.22, 3.21, 2.96, 2.89, 3.04, 2.99, 3.08, 3.12)
+y_under <- c(0.175, 0.173, 0.197, 0.182, 0.176, 0.205, 0.188, 0.186, 0.202, 0.208, 0.213)
+x <- 1986:1996
+plot(x, y_surf)
+```
+```{r}
+plot(x, y_surf, pch = 18)
+```
+```{r}
+plot(x, y_surf, pch = 18, cex = 2)
+```
+```{r}
+plot(x, y_under, pch = 18, cex = 2)
+```
+```{r}
+print(cor(x, y_surf))
+print(cor(x, y_under))
+```
+```{r}
+print(cor(x, y_surf, method = 'kendall'))
+print(cor(x, y_under, method = 'kendall'))
+```
+```{r}
+cor.test(x, y_surf, alternative = 'greater', method = 'kendall', exact = F)
+```
+```{r}
+cor(x, y_under, method = 'kendall', alternative = 'greater')
+```

@@ -5,11 +5,10 @@ output: pdf_document
 latex_engine: xelatex
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, echo = F}
+library(knitr)
+opts_chunk$set(tidy.opts = list(width.cutoff = 80), tidy = TRUE)
 ```
-
-
 
 # Chapter 7
 
@@ -53,15 +52,15 @@ U <- W_n - (n_1 * (n_1 + 1) / 2)
 Since there are ties in the ranks
 $$W_n \sim \mathcal{N} \left(
 \frac{n_1(n+1)}{2},
-\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}
+\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum\limits_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}
 \right)$$
 where $t_1, \ldots,t_k$ are the number of different observations among all the observations in the combined sample.
 
 
 We reject if
 \begin{align*}
-\frac{W_n -\frac{n_1(n+1)}{2}}{\sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}}} &> z_{0.05} \\
-\Leftrightarrow W_n  &> z_{0.05} * \left( \sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}} \right) +\frac{n_1(n+1)}{2}
+\frac{W_n -\frac{n_1(n+1)}{2}}{\sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum\limits_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}}} &> z_{0.05} \\
+\Leftrightarrow W_n  &> z_{0.05} * \left( \sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum\limits_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}} \right) +\frac{n_1(n+1)}{2}
 \end{align*}
 
 ```{r}
@@ -69,20 +68,23 @@ t <- tabulate(rnk)
 t <- t[t != 0]
 t_sum <- sum(t^3 - t)
 
-lower <- qnorm(1-0.05) *
-  sqrt(n_1 * n_2 * (n + 1) / 12 - (n_1 * n_2 * t_sum )/ (12 * n * (n + 1))) + (n_1 * (n + 1) / 2) 
+lower <- qnorm(1 - 0.05) *
+  sqrt(
+    (n_1 * n_2 * (n + 1) / 12)
+      - (n_1 * n_2 * t_sum) / (12 * n * (n + 1))
+  )
++(n_1 * (n + 1) / 2)
 
 if (W_n > lower) {
-  print("We reject the null hypothesis for the alternative")
+  print("We reject the null hypothesis for the alternative.")
 } else {
-  print("We accept the null hypothesis")
+  print("We accept the null hypothesis.")
 }
-
 ```
 ABER:
 
 ```{r}
-wilcox.test(x=a,y=b,alternative = "two.sided",conf.level = 0.95,exact=F)
+wilcox.test(x = a, y = b, alternative = "two.sided", conf.level = 0.95, exact = F)
 ```
 
 ## Problem 6
@@ -106,18 +108,22 @@ stereogram_data$fusion.time <- as.numeric(stereogram_data$fusion.time)
 stereogram_data$group <- factor(stereogram_data$group)
 table(stereogram_data$group) # we have n_1 and n_2 > 10
 #means <- with(stereogram_data, tapply(fusion.time, group, mean))
+```
+```{r}
 means <- aggregate(fusion.time ~ group, stereogram_data, mean)
 print(means)
-
 ```
 Yes, the median time does prove to be greater for the NV group.
 
 ```{r}
-
-t.test(subset(stereogram_data, subset = (group =="NV"))$fusion.time , 
-       subset(stereogram_data, subset = (group =="VV"))$fusion.time, 
-       alternative = "greater", var.equal = FALSE)
-
+t.test(
+  x = subset(stereogram_data,
+             subset = (group == "NV"))$fusion.time,
+  y = subset(stereogram_data,
+             subset = (group == "VV"))$fusion.time,
+  alternative = "greater",
+  var.equal = FALSE
+)
 ```
 
 The two-sample t-test confirms our observation. We reject $H_0$ for the alternative.
@@ -132,7 +138,7 @@ The exact distribution can be found as
 $$P(W_n = m) = \frac{k_{n_1,n_2}(m)}{\left( \begin{array}{c} n \\ n_1 \end{array} \right)}, \frac{n_1(n_1+1)}{2} \leq m \leq \frac{n_1(2n -n_1 +1)}{2}$$
 
 with $k_{n_1,n_2} (m)$ the number of all arrangements of zeroes and ones in $(S_1(X,Y), \ldots, S_n(X,Y))$
-such that $W_n =\sum_{i=1}^n iS_i(X,Y) = m$.
+such that $W_n =\sum\limits_{i=1}^n iS_i(X,Y) = m$.
 
 We have
 $$n_1 =4, n_2= 2, n = n_1 +n_2 = 6$$

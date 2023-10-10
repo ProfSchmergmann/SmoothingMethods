@@ -71,6 +71,12 @@ t_sum <- sum(t^3 - t)
 lower <- (1 - pnorm(0.05)) *
   (n_1 * (n + 1) / 2) *
   sqrt(n_1 * n_2 * (n + 1) / 12 - n_1 * n_2 * t_sum / (12 * n * (n + 1)))
+
+if (W_n > lower) {
+  print("We reject the null hypothesis fot he alternative")
+} else {
+  print("We accept the null hypothesis")
+}
 ```
 
 ## Problem 6
@@ -106,7 +112,7 @@ t.test(subset(stereogram_data, subset = (group =="NV"))$fusion.time , subset(ste
 
 ```
 
-The two-sample t-test confirms our observation.
+The two-sample t-test confirms our observation. We rejcect $H_0$ for the alternative.
 
 # Problem 7
 

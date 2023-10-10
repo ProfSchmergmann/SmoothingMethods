@@ -72,8 +72,7 @@ lower <- qnorm(1 - 0.05) *
   sqrt(
     (n_1 * n_2 * (n + 1) / 12)
       - (n_1 * n_2 * t_sum) / (12 * n * (n + 1))
-  )
-+(n_1 * (n + 1) / 2)
+  )+(n_1 * (n + 1) / 2)
 
 if (W_n > lower) {
   print("We reject the null hypothesis for the alternative.")

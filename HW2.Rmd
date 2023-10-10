@@ -35,6 +35,7 @@ $$W_n =\sum_{n=1}^{n_1} R_i$$
 
 We reject when $W_n \geq k_{0.05}$.
 
+
 ```{r}
 #rm(list=ls())
 a <- c(7, 2, 3, -1, 4, 6, 0, 1, 4, 6)
@@ -60,7 +61,7 @@ where $t_1, \ldots,t_k$ are the number of different observations among all the o
 We reject if
 \begin{align*}
 \frac{W_n -\frac{n_1(n+1)}{2}}{\sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}}} &> z_{0.05} \\
-\Leftrightarrow W_n  &> z_{0.05} +\frac{n_1(n+1)}{2}* \left( \sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}} \right)
+\Leftrightarrow W_n  &> z_{0.05} * \left( \sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}} \right) +\frac{n_1(n+1)}{2}
 \end{align*}
 
 ```{r}
@@ -68,15 +69,20 @@ t <- tabulate(rnk)
 t <- t[t != 0]
 t_sum <- sum(t^3 - t)
 
-lower <- (1 - pnorm(0.05)) *
-  (n_1 * (n + 1) / 2) *
-  sqrt(n_1 * n_2 * (n + 1) / 12 - n_1 * n_2 * t_sum / (12 * n * (n + 1)))
+lower <- qnorm(1-0.05) *
+  sqrt(n_1 * n_2 * (n + 1) / 12 - (n_1 * n_2 * t_sum )/ (12 * n * (n + 1))) + (n_1 * (n + 1) / 2) 
 
 if (W_n > lower) {
-  print("We reject the null hypothesis fot he alternative")
+  print("We reject the null hypothesis for the alternative")
 } else {
   print("We accept the null hypothesis")
 }
+
+```
+ABER:
+
+```{r}
+wilcox.test(x=a,y=b,alternative = "two.sided",conf.level = 0.95,exact=F)
 ```
 
 ## Problem 6
@@ -108,11 +114,13 @@ Yes, the median time does prove to be greater for the NV group.
 
 ```{r}
 
-t.test(subset(stereogram_data, subset = (group =="NV"))$fusion.time , subset(stereogram_data, subset = (group =="VV"))$fusion.time, alternative = "greater", var.equal = FALSE)
+t.test(subset(stereogram_data, subset = (group =="NV"))$fusion.time , 
+       subset(stereogram_data, subset = (group =="VV"))$fusion.time, 
+       alternative = "greater", var.equal = FALSE)
 
 ```
 
-The two-sample t-test confirms our observation. We rejcect $H_0$ for the alternative.
+The two-sample t-test confirms our observation. We reject $H_0$ for the alternative.
 
 # Problem 7
 
@@ -155,5 +163,5 @@ $17$ &$(2,4,5,6)$ & 1/15\\
 $18$ &$(3,4,5,6)$ & 1/15\\
 \hline
 \end{tabular}
-\end{table}%
+\end{table}
 

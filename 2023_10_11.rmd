@@ -1,0 +1,39 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: October 11, 2023
+output: pdf_document
+---
+```{r}
+yield <- c(83, 91, 94, 89, 89, 96, 91, 92, 90, 84, 91, 90, 81, 83, 84, 83, 88, 91, 89, 101, 100, 91, 93, 96, 95, 94, 81, 78, 82, 81, 77, 79, 81, 80)
+pl <- c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4)
+pl <- factor(pl)
+table(pl)
+```
+```{r}
+yield_data <- data.frame(x = yield, plot = pl)
+boxplot(x ~ plot, data = yield_data)
+```
+```{r}
+out <- aov(x ~ plot, data = yield_data)
+```
+```{r}
+summary(out)
+```
+```{r}
+rank(yield)
+```
+```{r}
+yield_data$ranks <- rank(yield_data$x)
+yield_data
+```
+```{r}
+boxplot(ranks~plot, data = yield_data)
+```
+```{r}
+out2 <- aov(ranks~plot, data = yield_data)
+summary(out2)
+```
+```{r}
+kruskal.test(x~plot, data = yield_data)
+```

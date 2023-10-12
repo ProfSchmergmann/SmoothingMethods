@@ -60,7 +60,7 @@ where $t_1, \ldots,t_k$ are the number of different observations among all the o
 We reject if
 \begin{align*}
 \frac{W_n -\frac{n_1(n+1)}{2}}{\sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum\limits_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}}} &> z_{0.05} \\
-\Leftrightarrow W_n  &> z_{0.05} * \left( \sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum\limits_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}} \right) +\frac{n_1(n+1)}{2}
+\Leftrightarrow W_n  &> \underbrace{z_{0.05} * \left( \sqrt{\frac{n_1n_2(n+1)}{12} - \frac{n_1n_2\sum\limits_{i=1}^{k}(t_i^3 -t_i)}{12n(n+1)}} \right) +\frac{n_1(n+1)}{2}}_{k_0.05}
 \end{align*}
 
 ```{r}
@@ -80,7 +80,7 @@ if (W_n > lower) {
   print("We accept the null hypothesis.")
 }
 ```
-ABER:
+If we choose the same test implemented in R we somehow get a different result. See below.
 
 ```{r}
 wilcox.test(x = a, y = b, alternative = "two.sided", conf.level = 0.95, exact = F)
@@ -105,8 +105,7 @@ $$H_0:\mu_{NV}^2 = \mu_{VV}^2 \text{ vs } H_1:\mu_{NV}^2 >\mu_{VV}^2$$
 stereogram_data <- read.delim2("stereograms.txt")
 stereogram_data$fusion.time <- as.numeric(stereogram_data$fusion.time)
 stereogram_data$group <- factor(stereogram_data$group)
-table(stereogram_data$group) # we have n_1 and n_2 > 10
-#means <- with(stereogram_data, tapply(fusion.time, group, mean))
+table(stereogram_data$group)
 ```
 ```{r}
 means <- aggregate(fusion.time ~ group, stereogram_data, mean)
@@ -137,7 +136,7 @@ The exact distribution can be found as
 $$P(W_n = m) = \frac{k_{n_1,n_2}(m)}{\left( \begin{array}{c} n \\ n_1 \end{array} \right)}, \frac{n_1(n_1+1)}{2} \leq m \leq \frac{n_1(2n -n_1 +1)}{2}$$
 
 with $k_{n_1,n_2} (m)$ the number of all arrangements of zeroes and ones in $(S_1(X,Y), \ldots, S_n(X,Y))$
-such that $W_n =\sum\limits_{i=1}^n iS_i(X,Y) = m$.
+such that $$W_n =\sum\limits_{i=1}^n i\cdot S_i(X,Y) = m.$$
 
 We have
 $$n_1 =4, n_2= 2, n = n_1 +n_2 = 6$$

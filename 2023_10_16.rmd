@@ -1,0 +1,63 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: October 16, 2023
+output: pdf_document
+---
+```{r}
+require(MASS)
+library(MASS)
+data()
+```
+```{r}
+data(Rubber)
+hist(Rubber$tens)
+hist(Rubber$tens, breaks = 5)
+hist(Rubber$tens, breaks = 20)
+hist(Rubber$tens, breaks = 10)
+```
+```{r}
+hist(Rubber$tens, breaks = 5)
+hist(Rubber$loss)
+```
+```{r}
+
+mean(Rubber$loss)
+var(Rubber$loss)
+sd(Rubber$loss)
+```
+```{r}
+x <- qnorm(p = seq(.2, .8, by = .2), mean = 175, sd = 90)
+sum(Rubber$loss <= x[1])
+sum((Rubber$loss > x[1]) & (Rubber$loss <= x[2]))
+sum((Rubber$loss > x[2]) & (Rubber$loss <= x[3]))
+sum((Rubber$loss > x[3]) & (Rubber$loss <= x[4]))
+sum((Rubber$loss > x[4]))
+```
+```{r}
+y <- cut(Rubber$loss,breaks=c(-Inf,x,Inf))
+y
+```
+```{r}
+Rubber$loss
+N <- table(y)
+N
+```
+```{r}
+chisq.test(N)
+out <- chisq.test(N)
+summary(out)
+out$expected
+```
+```{r}
+x <- qnorm(p=seq(.2,.8,by=.2),mean=200,sd=90)
+y <- cut(Rubber$loss,breaks=c(-Inf,x,Inf))
+N <- table(y)
+chisq.test(N)
+```
+```{r}
+x <- qnorm(p=seq(.2,.8,by=.2),mean=250,sd=90)
+y <- cut(Rubber$loss,breaks=c(-Inf,x,Inf))
+N <- table(y)
+chisq.test(N)
+```

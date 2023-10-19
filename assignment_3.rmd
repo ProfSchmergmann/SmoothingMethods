@@ -66,7 +66,17 @@ Use a nonparametric test to find out which nematocides are different:
 | 17.9         |              | 18.5         |              |
 
 ### Solution
+```{r}
+a <- c(18.6, 18.4, 18.4, 18.5, 17.9)
+b <- c(18.7, 19.0, 18.9, 18.5)
+c <- c(19.4, 18.9, 19.5, 19.1, 18.5)
+d <- c(19.0, 18.8, 18.6, 18.7)
 
+data <- c(a, b, c, d)
+belong <- c(rep(1, length(a)), rep(2, length(b)), rep(3, length(c)), rep(4, length(d)))
+
+kruskal.test(data, belong)
+```
 
 # Chapter 9
 

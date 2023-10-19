@@ -97,7 +97,18 @@ Use $\alpha = 0.05$:
 *Hint:*
 Assume that parameter $\lambda = 0.76$ (approximately the ratio 911/1200).
 Find theoretical frequencies first.
-For example, the theoretical frequency for number = 2 is $np_2 = 1200 \times 0.762^2/2! \times \exp{(-.76)} = 162.0745$, while the observed frequency is 168.
+For example, the theoretical frequency for number = 2 is $np_2 = 1200 \times 0.76^2/2! \times \exp{(-.76)} = 162.0745$, while the observed frequency is 168.
 Subtract an additional degree of freedom because $\lambda$ is estimated from the data (Figure 9.6).
 
 ### Solution
+```{r}
+num <- c(0, 1, 2, 3, 4, 5)
+f <- c(584, 398, 168, 35, 9, 6)
+n <- sum(f)
+lambda <- 0.76
+f_theo <- n * lambda^num / 2 * exp(-lambda)
+X_squared <- sum((f - f_theo)^2 / f_theo)
+print(X_squared)
+crit_val <- qchisq(p=0.05, df=length(f)-1)
+print(crit_val)
+```

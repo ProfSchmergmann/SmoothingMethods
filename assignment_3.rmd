@@ -35,6 +35,18 @@ What about the nonparametric procedure?
 
 ### Solution
 
+```{r}
+duke <- c(7.5, 8.7, 7.1, 18.2)
+unc <- c(5.5, 6.2, 13.0, 9.7, 12.9, 5.9, 1.9)
+nscu <- c(16.9, 4.5, 10.5, 4.4, 4.6, 18.7, 8.7, 15.8)
+gt <- c(7.9, 7.8, 14.5, 6.1, 4.0, 14.0)
+
+data <- c(duke, unc, nscu, gt)
+belong <- c(rep(1, length(duke)), rep(2, length(unc)), rep(3, length(nscu)), rep(4, length(gt)))
+
+kruskal.test(data, belong)
+```
+
 ## Problem 5
 
 Some varieties of nematodes (roundworms that live in the soil and are frequently so small they are invisible to the naked eye) feed on the roots of lawn grasses and crops such as strawberries and tomatoes.

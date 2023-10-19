@@ -35,6 +35,12 @@ What about the nonparametric procedure?
 
 ### Solution
 
+This could be analyzed with a parametric procedure such as ANOVA, since the variances between
+groups are roughly equal. We would still need to check for the normality of the
+data after performing a test, since the F-Test assumes normality.
+
+Non-parametric methods like Kruskal-Wallis-Test do not require us to do that, since it doesn't assume normality.
+
 ```{r}
 duke <- c(7.5, 8.7, 7.1, 18.2)
 unc <- c(5.5, 6.2, 13.0, 9.7, 12.9, 5.9, 1.9)
@@ -46,6 +52,9 @@ belong <- c(rep(1, length(duke)), rep(2, length(unc)), rep(3, length(nscu)), rep
 
 kruskal.test(data, belong)
 ```
+
+The non-parametric procedure in form of the Kruskal-Wallis-Test delivers the same result.
+
 
 ## Problem 5
 
@@ -77,6 +86,23 @@ belong <- c(rep(1, length(a)), rep(2, length(b)), rep(3, length(c)), rep(4, leng
 
 kruskal.test(data, belong)
 ```
+
+We now know that one of them is different from the others.
+
+
+We can use trial-and-error to figure out which one:
+
+
+```{r}
+kruskal.test(c(a,b),c(rep(1, length(a)), rep(2, length(b))))
+
+kruskal.test(c(a,c,d),c(rep(1, length(a)), rep(2, length(c)),rep(3, length(d))))
+
+kruskal.test(c(b,c,d),c(rep(1, length(b)), rep(2, length(c)),rep(3, length(d))))
+
+```
+
+Nematocits A are different from all of the others.
 
 # Chapter 9
 

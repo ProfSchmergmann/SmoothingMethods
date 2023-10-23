@@ -35,9 +35,8 @@ What about the nonparametric procedure?
 
 ### Solution
 
-This could be analyzed with a parametric procedure such as ANOVA, since the variances between
-groups are roughly equal. We would still need to check for the normality of the
-data after performing a test, since the F-Test assumes normality.
+This could be analyzed with a parametric procedure such as ANOVA, since the variances between groups are roughly equal.
+We would still need to check for the normality of the data after performing a test, since the $F$-Test assumes normality.
 
 Non-parametric methods like Kruskal-Wallis-Test do not require us to do that, since it doesn't assume normality.
 
@@ -89,10 +88,7 @@ kruskal.test(data, belong)
 
 We now know that one of them is different from the others.
 
-
 We can use trial-and-error to figure out which one:
-
-
 ```{r}
 kruskal.test(c(a,b),c(rep(1, length(a)), rep(2, length(b))))
 
@@ -102,7 +98,7 @@ kruskal.test(c(b,c,d),c(rep(1, length(b)), rep(2, length(c)),rep(3, length(d))))
 
 ```
 
-Nematocits A are different from all of the others.
+Nematocits A are different from all the others.
 
 # Chapter 9
 

@@ -85,20 +85,18 @@ belong <- c(rep(1, length(a)), rep(2, length(b)), rep(3, length(c)), rep(4, leng
 
 kruskal.test(data, belong)
 ```
-
 We now know that one of them is different from the others.
 
 We can use trial-and-error to figure out which one:
 ```{r}
-kruskal.test(c(a,b),c(rep(1, length(a)), rep(2, length(b))))
-
-kruskal.test(c(a,c,d),c(rep(1, length(a)), rep(2, length(c)),rep(3, length(d))))
-
-kruskal.test(c(b,c,d),c(rep(1, length(b)), rep(2, length(c)),rep(3, length(d))))
-
+kruskal.test(c(a, b, c, d), c(rep(1, length(a)), rep(2, length(b)), rep(3, length(c)), rep(4, length(d))))
+kruskal.test(c(b, c, d), c(rep(2, length(b)), rep(3, length(c)), rep(4, length(d))))
+kruskal.test(c(a, c, d), c(rep(1, length(a)), rep(3, length(c)), rep(4, length(d))))
+kruskal.test(c(a, b, d), c(rep(1, length(a)), rep(2, length(b)), rep(4, length(d))))
+kruskal.test(c(a, b, c), c(rep(1, length(a)), rep(2, length(b)), rep(3, length(c))))
 ```
-
-Nematocits A are different from all the others.
+So we see that if we take out sample $a$ from the sample group we have the largest p-value where we accept the $H_0$ hypothesis with $p=0.3385$.
+This means that sample $a$ is different from all others.
 
 # Chapter 9
 
@@ -128,9 +126,21 @@ num <- c(0, 1, 2, 3, 4, 5)
 f <- c(584, 398, 168, 35, 9, 6)
 n <- sum(f)
 lambda <- 0.76
+```
+```{r}
 f_theo <- n * lambda^num / 2 * exp(-lambda)
+print(f_theo)
+```
+```{r}
+plot(num, f, type='l', col='blue')
+lines(num, f_theo, type = 'l', col='red')
+```
+```{r}
 X_squared <- sum((f - f_theo)^2 / f_theo)
 print(X_squared)
-crit_val <- qchisq(p=0.05, df=length(f)-1)
+```
+```{r}
+crit_val <- qchisq(p = 1-0.05, df = length(f) - 2)
 print(crit_val)
 ```
+Since $X^2$ is substantially larger than the critical value, we reject that the data follows a Poisson distribution.

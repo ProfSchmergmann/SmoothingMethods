@@ -1,0 +1,39 @@
+---
+title: "HW4 - Lucas Fellmeth, Sven Bergmann"
+date: "2023-11-01"
+output: pdf_document
+latex_engine: xelatex
+---
+
+```{r setup, echo = F}
+library(knitr)
+opts_chunk$set(tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+
+# Chapter 11
+
+# Exercise 5
+Recall Exercise 6.3 based on 100 measurements of the speed of light in air.
+In that chapter, we tested the data for normality.
+Use the same data to construct a density estimator that you feel gives the best visual display of the information provided by the data.
+What parameters did you choose?
+The data can be downloaded from
+http://www.itl.nist.gov/div898/strd/univ/data/Michelso.dat
+
+# Chapter 12
+
+# Exercise 1
+Using robust regression, find the intercept and slope $\tilde{\beta}_0$ and $\tilde{\beta}_1$ for each of the four data sets of Anscombe (1973) from p. 244.
+Plot the ordinary least-squares regression along with the rank regression estimator of slope.
+Contrast these with one of the other robust regression techniques.
+For which set does $\tilde{\beta}_1$ differ the most from its LS counterpart $\hat{\beta}_1 = 0.5$?
+Note that in the fourth set, 10 out of 11 Xs are equal, so one should use
+$$S_{ij} = (Y_j − Y_i)∕(X_j − X_i + \epsilon) to avoid dividing by 0.
+After finding $\tilde{\beta}_0$ and $\tilde{\beta}_1$, are they different than $\hat{\beta}_0$ and $\hat{\beta}_1$?
+Is the hypothesis $H_0 ∶ \beta_1 = 1∕2$ rejected in a robust test against the alternative $H_1 ∶ \beta_1 < 1∕2$, for data set 3?
+Note here $\beta_{10} = 1∕2$.
+
+
+
+
+Exercises 11.5 and 12.1 (here, for each data set, compare the least squares estimator with the least median of squares estimator and the M-estimator with Tukey's bisquare function). Due Wednesday Nov 8.

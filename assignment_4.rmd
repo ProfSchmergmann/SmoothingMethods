@@ -40,8 +40,117 @@ $$S_{ij} = (Y_j - Y_i)/(X_j - X_i + \epsilon)$$ to avoid dividing by 0.
 After finding $\tilde{\beta}_0$ and $\tilde{\beta}_1$, are they different than $\hat{\beta}_0$ and $\hat{\beta}_1$?
 Is the hypothesis $H_0 : \beta_1 = 1/2$ rejected in a robust test against the alternative $H_1 : \beta_1 < 1/2$, for data set 3?
 Note here $\beta_{10} = 1/2$.
+<<<<<<< HEAD
+=======
+
+```{r}
+library(robustbase)
+library(MASS)
+library(L1pack)
+
+data <- read.csv("anscombe.csv")
+data$dataset <- factor(data$dataset)
+data1 <- subset(data, subset = data$dataset == "I")
+data2 <- subset(data, subset = data$dataset == "II")
+data3 <- subset(data, subset = data$dataset == "III")
+data4 <- subset(data, subset = data$dataset == "IV")
+```
+
+```{r}
+plot(y~x,data=data1)
+lmfit <- lm(y~x,data=data1)
+abline(coef=coefficients(lmfit),col="red",lwd=2)
+lmedfit <- lmsreg(y~x,data=data1)
+abline(coef=coefficients(lmedfit),col="blue",lwd=2)
+robfit <- rlm(y~x,data=data1,method="M",psi = psi.bisquare,
+              init=coefficients(lmedfit)) 
+abline(coef = coefficients(robfit), col="magenta", lwd=2)
+
+coefficients(lmfit)
+coefficients(lmedfit)
+
+coefficients(robfit)
+```
+For dataset 1 $\tilde{\beta}_1$ differs the at most $0.070$ from the LS counterpart $\hat{\beta}_1 = 0.5.$ This difference is attained with the least median of squares estimator.
+
+```{r}
+plot(y~x,data=data2)
+lmfit <- lm(y~x,data=data2)
+abline(coef=coefficients(lmfit),col="red",lwd=2)
+lmedfit <- lmsreg(y~x,data=data2)
+abline(coef=coefficients(lmedfit),col="blue",lwd=2)
+robfit <- rlm(y~x,data=data2,method="M",psi = psi.bisquare,
+              init=coefficients(lmedfit)) 
+abline(coef = coefficients(robfit), col="magenta", lwd=2)
+
+coefficients(lmfit)
+coefficients(lmedfit)
+coefficients(robfit)
+```
+For dataset 2 $\tilde{\beta}_1$ differs at most $0.38$ from the LS counterpart $\hat{\beta}_1 = 0.5.$
+This difference is attained with the least median of squares estimator.
+
+```{r}
+plot(y~x,data=data3)
+lmfit <- lm(y~x,data=data3)
+abline(coef=coefficients(lmfit),col="red",lwd=2)
+lmedfit <- lmsreg(y~x,data=data3)
+abline(coef=coefficients(lmedfit),col="blue",lwd=2)
+robfit <- rlm(y~x,data=data3,method="MM",psi = psi.bisquare,
+              init=coefficients(lmedfit)) 
+abline(coef = coefficients(robfit), col="magenta", lwd=2)
+
+coefficients(lmfit)
+coefficients(lmedfit)
+coefficients(robfit)
+```
+For dataset 3 $\tilde{\beta}_1$ differs at most $0.155$ from the LS counterpart $\hat{\beta}_1 = 0.5.$
+This difference is attained with the least median of squares estimator & the M estimator using Tukey's bisquare function.
 
 
+
+```{r}
+plot(y~x,data=data4)
+lmfit <- lm(y~x,data=data4)
+abline(coef=coefficients(lmfit),col="red",lwd=2)
+lmedfit <- lmsreg(y~x,data=data4)
+abline(coef=coefficients(lmedfit),col="blue",lwd=2)
+robfit <- rlm(y~x,data=data4,method="M",psi = psi.bisquare,
+              init=coefficients(lmedfit)) 
+abline(coef = coefficients(robfit), col="magenta", lwd=2)
+
+lmfit$coefficients
+lmedfit$coefficients
+robfit$coefficients
+```
+
+
+For dataset 4 $\tilde{\beta}_1$ differs at most $0.10$ from the LS counterpart $\hat{\beta}_1 = 0.5.$
+This difference is attained with the least median of squares estimator.
+
+
+Dataset 3 has the highest difference between $\tilde{\beta}_1$ and $\hat{\beta}_1 = 0.5
+with a difference of $0.155.$
+
+
+$\tilde{\beta}_0$ and $\tilde{\beta}_1$ are different than $\hat{\beta}_0$ and $\hat{\beta}_1$ for two of the three estimators in dataset 3.
+
+
+Is the hypothesis $H_0 : \beta_1 = 1/2$ rejected in a robust test against the alternative $H_1 : \beta_1 < 1/2$, for data set 3?
+
+```{r}
+n <- length(data3$x)
+x <- data3$x
+y <- data3$y
+beta_1 <- 0.5
+beta_10 <- 0.5
+U <- y - beta_10*x
+rho_hat <- beta_1 * sqrt(sum(rank(x)^2-mean(rank(x))))/sqrt(sum(rank(U)^2-mean(rank(U))))
+p <- 1 -pnorm(rho_hat*sqrt(n-1))
+p 
+```
+
+We accept the hypothesis $H_0 : \beta_1 = 1/2$ since $p > 0.05$
 
 
 Exercises 11.5 and 12.1 (here, for each data set, compare the least squares estimator with the least median of squares estimator and the M-estimator with Tukey's bisquare function). Due Wednesday Nov 8.

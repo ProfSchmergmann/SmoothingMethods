@@ -1,0 +1,31 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: October 30, 2023
+output: pdf_document
+---
+```{r}
+require(robustbase)
+library(robustbase)
+```
+```{r}
+data(robustbase::starsCYG)
+hist()
+```
+```{r}
+x <- Rubber$loss
+kde <- density(x, bw = 1)
+plot(kde$x, kde$y, type = 'l')
+
+kde <- density(x, bw = 10)
+plot(kde$x, kde$y, type = 'l')
+
+kde <- density(x, bw = 50)
+plot(kde$x, kde$y, type = 'l')
+```
+```{r}
+hist(x, freq = F, nclass = 10)
+lines(kde$x, kde$y, col = 'red', lwd = 2)
+kde <- density(x, bw = 20)
+lines(kde$x, kde$y, col = 'green', lwd = 2)
+```

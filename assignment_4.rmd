@@ -62,10 +62,10 @@ for(dataset in datasets) {
     abline(coef = coefficients(lmfit), col = "red", lwd = 2)
     lmedfit <- lmsreg(y ~ x, data = dataset)
     abline(coef = coefficients(lmedfit), col = "blue", lwd = 2)
-    robfit <- rlm(y ~ x, data = dataset, method = "M", psi = psi.bisquare,
+    robfit <- rlm(y ~ x, data = dataset, method = "MM", psi = psi.bisquare,
                   init = coefficients(lmedfit))
     abline(coef = coefficients(robfit), col = "magenta", lwd = 2)
-    cat('Coefficients for', dataset[[1]], ':')
+    cat('Coefficients for dataset', dataset[[1]][1], ':\n')
     print(coefficients(lmfit))
     print(coefficients(lmedfit))
     print(coefficients(robfit))
@@ -73,68 +73,19 @@ for(dataset in datasets) {
 ```
 For dataset 1 $\tilde{\beta}_1$ differs the at most $0.070$ from the LS counterpart $\hat{\beta}_1 = 0.5.$ This difference is attained with the least median of squares estimator.
 
-```{r}
-plot(y ~ x, data = data2)
-lmfit <- lm(y ~ x, data = data2)
-abline(coef = coefficients(lmfit), col = "red", lwd = 2)
-lmedfit <- lmsreg(y ~ x, data = data2)
-abline(coef = coefficients(lmedfit), col = "blue", lwd = 2)
-robfit <- rlm(y ~ x, data = data2, method = "M", psi = psi.bisquare,
-              init = coefficients(lmedfit))
-abline(coef = coefficients(robfit), col = "magenta", lwd = 2)
-
-coefficients(lmfit)
-coefficients(lmedfit)
-coefficients(robfit)
-```
 For dataset 2 $\tilde{\beta}_1$ differs at most $0.38$ from the LS counterpart $\hat{\beta}_1 = 0.5.$
 This difference is attained with the least median of squares estimator.
 
-```{r}
-plot(y ~ x, data = data3)
-lmfit <- lm(y ~ x, data = data3)
-abline(coef = coefficients(lmfit), col = "red", lwd = 2)
-lmedfit <- lmsreg(y ~ x, data = data3)
-abline(coef = coefficients(lmedfit), col = "blue", lwd = 2)
-robfit <- rlm(y ~ x, data = data3, method = "MM", psi = psi.bisquare,
-              init = coefficients(lmedfit))
-abline(coef = coefficients(robfit), col = "magenta", lwd = 2)
-
-coefficients(lmfit)
-coefficients(lmedfit)
-coefficients(robfit)
-```
 For dataset 3 $\tilde{\beta}_1$ differs at most $0.155$ from the LS counterpart $\hat{\beta}_1 = 0.5.$
 This difference is attained with the least median of squares estimator & the M estimator using Tukey's bisquare function.
-
-
-
-```{r}
-plot(y ~ x, data = data4)
-lmfit <- lm(y ~ x, data = data4)
-abline(coef = coefficients(lmfit), col = "red", lwd = 2)
-lmedfit <- lmsreg(y ~ x, data = data4)
-abline(coef = coefficients(lmedfit), col = "blue", lwd = 2)
-robfit <- rlm(y ~ x, data = data4, method = "M", psi = psi.bisquare,
-              init = coefficients(lmedfit))
-abline(coef = coefficients(robfit), col = "magenta", lwd = 2)
-
-lmfit$coefficients
-lmedfit$coefficients
-robfit$coefficients
-```
-
 
 For dataset 4 $\tilde{\beta}_1$ differs at most $0.10$ from the LS counterpart $\hat{\beta}_1 = 0.5.$
 This difference is attained with the least median of squares estimator.
 
-
 Dataset 3 has the highest difference between $\tilde{\beta}_1$ and $\hat{\beta}_1 = 0.5$
 with a difference of $0.155.$
 
-
 $\tilde{\beta}_0$ and $\tilde{\beta}_1$ are different than $\hat{\beta}_0$ and $\hat{\beta}_1$ for two of the three estimators in dataset 3.
-
 
 Is the hypothesis $H_0 : \beta_1 = 1/2$ rejected in a robust test against the alternative $H_1 : \beta_1 < 1/2$, for data set 3?
 

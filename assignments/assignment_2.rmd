@@ -102,7 +102,7 @@ $$H_0:\mu_{NV}^2 = \mu_{VV}^2 \text{ vs } H_1:\mu_{NV}^2 >\mu_{VV}^2$$
 
 ```{r}
 #rm(list = ls())
-stereogram_data <- read.delim2("stereograms.txt")
+stereogram_data <- read.delim2("../lectures/stereograms.txt")
 stereogram_data$fusion.time <- as.numeric(stereogram_data$fusion.time)
 stereogram_data$group <- factor(stereogram_data$group)
 table(stereogram_data$group)

@@ -1,0 +1,9 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: November 08, 2023
+output: pdf_document
+---
+```{r}
+
+```

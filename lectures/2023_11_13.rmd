@@ -1,0 +1,51 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: November 13, 2023
+output: pdf_document
+---
+```{r}
+require(splines)
+library(splines)
+```
+```{r}
+x <- seq(0, 1, length.out = 200)
+knots <- c(0.2, 0.5, 0.8)
+Phi <- bs(x, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1))
+summary(dim(Phi))
+```
+```{r}
+matplot(x, Phi, lwd = 2, type = 'l')
+```
+```{r}
+knots <- c(0.2, 0.5, 0.6, 0.7, 0.9)
+Phi <- bs(x, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1))
+matplot(x, Phi, lwd = 2, type = 'l')
+```
+```{r}
+plot(x, rowSums(Phi), type = 'l')
+```
+```{r}
+rm(list = ls())
+m <- function(x) sin(4 * pi * x)
+x <- seq(0, 1, length.out = 50)
+ep <- rnorm(200, mean = 0, sd = 0.3)
+x <- seq(0, 1, length.out = 200)
+y <- m(x) + ep
+plot(x, y, pch = 16)
+knots <- c(.2, .4, .6, .8)
+Phi <- bs(x, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1))
+theta <- solve(t(Phi) %*% Phi) %*% t(Phi) %*% y
+mu_hat <- Phi %*% theta
+lines(x, mu_hat, lwd = 2, col = 'red')
+knots <- seq(.1, .9, by=.1)
+Phi <- bs(x, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1))
+theta <- solve(t(Phi) %*% Phi) %*% t(Phi) %*% y
+mu_hat <- Phi %*% theta
+lines(x, mu_hat, lwd = 2, col = 'blue')
+knots <- seq(.05, .95, by=.05)
+Phi <- bs(x, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1))
+theta <- solve(t(Phi) %*% Phi) %*% t(Phi) %*% y
+mu_hat <- Phi %*% theta
+lines(x, mu_hat, lwd = 2, col = 'green')
+```

@@ -1,0 +1,37 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: November 15, 2023
+output: pdf_document
+---
+```{r}
+require(splines)
+library(splines)
+require(MASS)
+library(MASS)
+```
+```{r}
+x <- mcycle$times
+y <- mcycle$accel
+plot(x, y, pch = 16)
+```
+```{r}
+a <- 2.4
+b <- 58
+k <- 1
+knots <- seq(a, b, length.out = k + 2)[2:(k + 1)]
+Phi <- bs(x, knots = knots, degree = 3, intercept = T, Boundary.knots = c(a, b))
+matplot(x, Phi, lwd = 2, type = 'l')
+H <- Phi %*% solve(t(Phi) %*% Phi) %*% t(Phi)
+y_hat <- H %*% y
+lines(x, y_hat, col = 'red', lwd = 2)
+```
+```{r}
+source('cv_mcycle')
+print(mcycle(7))
+k <- 1:15
+cv <- sapply(k, cv_mcycle)
+print(cv)
+plot(cv, k, type = 'b')
+plot(k, cv, type = 'b')
+```

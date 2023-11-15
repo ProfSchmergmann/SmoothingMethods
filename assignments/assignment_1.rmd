@@ -78,7 +78,7 @@ $$ T \sim B(X,0.9). $$
 ```{r}
 for (n in 1:1000) {
   if (length(which(pbinom(1:n, size = n, prob = 0.9) >= 0.95)) == 3) {
-    cat('The sample size must be greater or equal to', n, '.')
+    cat('The sample size must be greater or equal to', n, '..')
     break
   }
 }

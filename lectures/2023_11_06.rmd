@@ -1,0 +1,21 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: November 06, 2023
+output: pdf_document
+---
+```{r}
+require(locfit)
+```
+```{r}
+m <- function(x) sin(4 * pi * x)
+x <- (1:200) / 201
+ep <- rnorm(n = 200, mean = 0, sd = .3)
+y <- m(x) + ep
+plot(x, y, pch = 16, cex = 2)
+lines(x, m(x), col = 'red', lwd = 2)
+nwfit <- ksmooth(x, y, range.x = c(0, 1), kernel = 'normal', bandwidth = .1)
+lines(nwfit$x, nwfit$y, col = 'blue', lwd = 2)
+lpfit <- locfit(y ~ lp(x, h = .1), data = data.frame(x = x, y = y))
+plot(lpfit, get.data = T)
+```

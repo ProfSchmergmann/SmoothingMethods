@@ -34,8 +34,10 @@ First, we implement the generalized cross validation measure $GCV(h)$ which is d
 $$GCV(h) = \frac{1}{n} \sum_{i=1}^n \left[\frac{Y_i - \hat{m}_h(x)}{1 - \frac{tr S(h)}{n}}\right]^2$$
 where
 ```{r GCV(h)}
-GCV <- function(h) {
-
+GCV <- function(x, y, h, kernel = "normal") {
+  ndwatson <- ksmooth(x, y, kernel, bandwidth = h)
+  m_hat <- (sum())
+  Y <- ndwatson$y
 }
 ```
 ```{r}
@@ -43,6 +45,7 @@ with(mcycle, {
   plot(times, accel)
   for (b in 1:10) {
     lines(ksmooth(times, accel, "normal", bandwidth = b), col = "red")
+    print(ksmooth(times, accel, "normal", bandwidth = b)$y)
   }
 })
 ```

@@ -9,9 +9,11 @@ latex_engine: xelatex
 library(knitr)
 opts_chunk$set(tidy.opts = list(width.cutoff = 80), tidy = TRUE)
 ```
+## 1
 The goal of this problem is to estimate the regression function of acceleration vs time for the `mcycle` data in the package `MASS`.
 
-- Show that the Nadaraya-Watson estimator can be expressed as $\hat{Y} = HY$. Find the "hat matrix" $H$ explicitly.
+### A
+Show that the Nadaraya-Watson estimator can be expressed as $\hat{Y} = HY$. Find the "hat matrix" $H$ explicitly.
 
 We know that the Nadaraya-Watson estimator of $\hat{m}(x)$ is defined by
 $$\hat{m}(x) = \frac{\sum_{i=1}^n K_h(X_i - x)Y_i}{\sum_{i=1}^n K_h(X_i - x)},$$
@@ -21,7 +23,8 @@ with $h$ as associated bandwidth.
 
 
 
-- For a reasonable range of bandwidths $h$, compute and plot the generalized cross validation measure $GCV(h)$ and find the optimal bandwidth.
+### B
+For a reasonable range of bandwidths $h$, compute and plot the generalized cross validation measure $GCV(h)$ and find the optimal bandwidth.
 
 ```{r}
 library(MASS)
@@ -36,10 +39,10 @@ GCV <- function(h) {
 }
 ```
 ```{r}
-x <- mcycle$times
-y <- mcycle$accel
-plot(x, y, pch = 16)
-```
-```{r}
-
+with(mcycle, {
+  plot(times, accel)
+  for (b in 1:10) {
+    lines(ksmooth(times, accel, "normal", bandwidth = b), col = "red")
+  }
+})
 ```

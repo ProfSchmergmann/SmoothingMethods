@@ -1,0 +1,20 @@
+---
+title: "HW5 - Lucas Fellmeth, Sven Bergmann"
+date: "2023-11-16"
+output: pdf_document
+latex_engine: xelatex
+---
+
+```{r setup, echo = F}
+library(knitr)
+opts_chunk$set(tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+The goal of this problem is to estimate the regression function of acceleration vs time for the `mcycle` data in the package `MASS`.
+Show that the Nadaraya-Watson estimator can be expressed as $\hat{Y} = HY.
+Find the "hat matrix" H explicitly.
+For a reasonable range of bandwidths $h$, compute and plot the generalized cross validation measure $GCV(h)$ and find the optimal bandwidth.
+
+```{r}
+require(MASS)
+library(MASS)
+```

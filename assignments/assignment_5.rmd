@@ -15,12 +15,38 @@ The goal of this problem is to estimate the regression function of acceleration 
 ### A
 Show that the Nadaraya-Watson estimator can be expressed as $\hat{Y} = HY$. Find the "hat matrix" $H$ explicitly.
 
-We know that the Nadaraya-Watson estimator of $\hat{m}(x)$ is defined by
-$$\hat{m}(x) = \frac{\sum_{i=1}^n K_h(X_i - x)Y_i}{\sum_{i=1}^n K_h(X_i - x)},$$
+We know that the Nadaraya-Watson estimator of $\hat{m}(x_i)$ is defined by
+$$\hat{m}(x_i) = \frac{\sum_{j=1}^n K_h(x_j - x_i)Y_j}{\sum_{k=1}^n K_h(x_k - x_i)},$$
 where
 $$K_h(x) = \frac{1}{h}K\left(\frac{x}{h}\right)$$
 with $h$ as associated bandwidth.
 
+So
+\begin{align*}
+\hat{m}(x_i)  &= \frac{\sum_{j=1}^n K_h(x_j - x_i)Y_j}{\sum_{k=1}^n K_h(x_k - x_i)} \\
+&= \frac{\sum_{j=1}^n \frac{1}{h} K(\frac{x_j - x_i}{h})Y_j}{\sum_{k=1}^n \frac{1}{h} K(\frac{x_k - x_i}{h})} \\
+&= \frac{\frac{1}{h} \sum_{j=1}^n K(\frac{x_j - x_i}{h})Y_j}{\frac{1}{h} \sum_{k=1}^n K(\frac{x_k - x_i}{h})} \\
+&= \frac{\sum_{j=1}^n K(\frac{x_j - x_i}{h})Y_j}{\sum_{k=1}^n K(\frac{x_k - x_i}{h})} \\
+&= \frac{\sum_{j=1}^n K(\frac{x_j - x_i}{h})}{\sum_{k=1}^n K(\frac{x_k - x_i}{h})} Y_j \\
+&= \sum_{j=1}^n \underbrace{\frac{K(\frac{x_j - x_i}{h})}{\sum_{k=1}^n K(\frac{x_k - x_i}{h})}}_{H_{ij}} Y_j \\
+\implies
+\underbrace{\left(\begin{array}{c}
+\hat{m}(x_1) \\
+\vdots \\
+\hat{m}(x_n)
+\end{array}\right)}_{\hat{Y}}
+&= \underbrace{\left(\begin{array}{ccc}
+H(x_{11}) & \ldots & H(x_{1n}) \\
+\vdots & \ddots & \vdots \\
+H(x_{n1}) & \ldots & H(x_{nn})
+\end{array}\right)}_{H}
+\cdot
+\underbrace{\left(\begin{array}{c}
+m(x_1) \\
+\vdots \\
+m(x_n)
+\end{array}\right)}_{Y}
+\end{align*}
 
 
 ### B
@@ -31,21 +57,25 @@ library(MASS)
 library(splines)
 ```
 First, we implement the generalized cross validation measure $GCV(h)$ which is defined by
-$$GCV(h) = \frac{1}{n} \sum_{i=1}^n \left[\frac{Y_i - \hat{m}_h(x)}{1 - \frac{tr S(h)}{n}}\right]^2$$
+$$GCV(h) = \frac{1}{n} \sum_{i=1}^n \left[\frac{Y_i - \hat{m}_h(x)}{1 - \frac{tr H(h)}{n}}\right]^2$$
 where
 ```{r GCV(h)}
 GCV <- function(x, y, h, kernel = "normal") {
-  ndwatson <- ksmooth(x, y, kernel, bandwidth = h)
-  m_hat <- (sum())
-  Y <- ndwatson$y
+  y_hat <- ksmooth(x, y, kernel, bandwidth = h)$y
+  H <- y_hat %*% t(y)
+  H_trace <- sum(diag(H))
+  n <- length(y)
+  gcv <- mean((y - y_hat)^2) / (1 - (H_trace / n))^2
+  return(gcv)
 }
 ```
 ```{r}
 with(mcycle, {
+  bw <- 1:15
+  gcv <- sapply(bw, GCV, x = times, y = accel)
+  plot(bw, gcv, type = 'b')
+  plot.new()
   plot(times, accel)
-  for (b in 1:10) {
-    lines(ksmooth(times, accel, "normal", bandwidth = b), col = "red")
-    print(ksmooth(times, accel, "normal", bandwidth = b)$y)
-  }
+  lines(times, ksmooth(times, accel, kernel = 'normal', bandwidth = min(gcv))$y, col = 'red', type = 'l')
 })
 ```

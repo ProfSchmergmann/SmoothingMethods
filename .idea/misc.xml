@@ -164,6 +164,14 @@
             </RMarkdownRenderProfile>
           </value>
         </entry>
+        <entry key="file://$PROJECT_DIR$/assignments/assignment_5.rmd">
+          <value>
+            <RMarkdownRenderProfile>
+              <option name="lastOutput" value="$PROJECT_DIR$/assignments/assignment_5.pdf" />
+              <option name="outputDirectoryUrl" value="file://$PROJECT_DIR$/assignments" />
+            </RMarkdownRenderProfile>
+          </value>
+        </entry>
         <entry key="file://$PROJECT_DIR$/lectures/2023_09_13.rmd">
           <value>
             <RMarkdownRenderProfile>

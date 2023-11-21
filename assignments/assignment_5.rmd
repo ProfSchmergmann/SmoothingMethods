@@ -9,10 +9,10 @@ latex_engine: xelatex
 library(knitr)
 opts_chunk$set(tidy.opts = list(width.cutoff = 80), tidy = TRUE)
 ```
-## 1
+# 1
 The goal of this problem is to estimate the regression function of acceleration vs time for the `mcycle` data in the package `MASS`.
 
-### A
+## A
 Show that the Nadaraya-Watson estimator can be expressed as $\hat{Y} = HY$. Find the "hat matrix" $H$ explicitly.
 
 We know that the Nadaraya-Watson estimator of $\hat{m}(x_i)$ is defined by
@@ -36,9 +36,9 @@ So
 \hat{m}(x_n)
 \end{array}\right)}_{\hat{Y}}
 &= \underbrace{\left(\begin{array}{ccc}
-H(x_{11}) & \ldots & H(x_{1n}) \\
+H(x_1, x_1) & \ldots & H(x_1, x_n) \\
 \vdots & \ddots & \vdots \\
-H(x_{n1}) & \ldots & H(x_{nn})
+H(x_n, x_1) & \ldots & H(x_n, x_n)
 \end{array}\right)}_{H}
 \cdot
 \underbrace{\left(\begin{array}{c}
@@ -49,7 +49,7 @@ m(x_n)
 \end{align*}
 
 
-### B
+## B
 For a reasonable range of bandwidths $h$, compute and plot the generalized cross validation measure $GCV(h)$ and find the optimal bandwidth.
 
 ```{r}
@@ -57,25 +57,68 @@ library(MASS)
 library(splines)
 ```
 First, we implement the generalized cross validation measure $GCV(h)$ which is defined by
-$$GCV(h) = \frac{1}{n} \sum_{i=1}^n \left[\frac{Y_i - \hat{m}_h(x)}{1 - \frac{tr H(h)}{n}}\right]^2$$
-where
+$$GCV(h) = \frac{1}{n} \sum_{i=1}^n \left[\frac{Y_i - \hat{m}_h(x)}{1 - \frac{tr H(h)}{n}}\right]^2.$$
+
+Therefore, we have to compute the "hat-matrix".
+
+### Kernels
+
+Inside the function for computing this matrix we can use different kernels, which are defined below.
+```{r}
+sin_cos_exp_kernel <- function(x) {
+  return((1 / 2) *
+           exp(-abs(x) / sqrt(2)) *
+           sin(abs(x) / 2 + pi / 4))
+}
+
+normal_kernel <- function(x) {
+  return(dnorm(x))
+}
+
+epanechnikov_kernel <- function(x) {
+  ifelse(abs(x) > 1, return(0), return(3 / 4 * (1 - x^2)))
+}
+```
+
+### Hat-matrix
+
+This function computes the "hat-matrix" using vectorized operations for faster results.
+```{r hat_matrix(x,h)}
+hat_matrix <- function(x, h) {
+  n <- length(x)
+  hatmat <- matrix(0, n, n)
+  for (i in 1:n) {
+    denominator <- sum(normal_kernel((x - x[i]) / h))
+    hatmat[i,] <- normal_kernel((x - x[i]) / h) / denominator
+  }
+  return(hatmat)
+}
+```
+
+### Generalized cross validation measure
+
+Here, we compute the GCV based on the definition from the book.
 ```{r GCV(h)}
-GCV <- function(x, y, h, kernel = "normal") {
-  y_hat <- ksmooth(x, y, kernel, bandwidth = h)$y
-  H <- y_hat %*% t(y)
-  H_trace <- sum(diag(H))
-  n <- length(y)
-  gcv <- mean((y - y_hat)^2) / (1 - (H_trace / n))^2
+GCV <- function(x, y, h) {
+  H <- hat_matrix(x, h)
+  y_hat <- H %*% y
+  gcv <- mean((y - y_hat)^2 / (1 - (sum(diag(H)) / length(y)))^2)
   return(gcv)
 }
 ```
+
+### Finding best bw
+
+In the code below we tried to replace the kernel which we used for computing the "hat-matrix" to find the best result.
+We found that the gaussian kernel produced the best result.
 ```{r}
 with(mcycle, {
-  bw <- 1:15
+  bw <- seq(0.01, 15, by = 0.01)
   gcv <- sapply(bw, GCV, x = times, y = accel)
-  plot(bw, gcv, type = 'b')
+  tmp <- data.frame(bw = bw, gcv = gcv)
+  plot(tmp)
   plot.new()
-  plot(times, accel)
-  lines(times, ksmooth(times, accel, kernel = 'normal', bandwidth = min(gcv))$y, col = 'red', type = 'l')
+  plot(times, accel, main = paste('min_bw =', tmp[which.min(tmp$gcv),]$bw))
+  lines(ksmooth(x = times, y = accel, kernel = 'normal', bandwidth = tmp[which.min(tmp$gcv),]$bw), col = 'red', type = 'l')
 })
 ```

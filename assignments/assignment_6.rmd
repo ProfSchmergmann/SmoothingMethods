@@ -1,0 +1,28 @@
+---
+title: "HW6 - Lucas Fellmeth, Sven Bergmann"
+date: "2023-11-29"
+output: pdf_document
+latex_engine: xelatex
+---
+
+```{r setup, echo = F}
+library(knitr)
+opts_chunk$set(tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+# 1
+The goal of this problem is to estimate the regression function of acceleration vs time for the `mcycle` data in the package `MASS`, using cubic smoothing splines.
+
+```{r}
+library(MASS)
+library(splines)
+```
+
+## A
+For a reasonable range of smoothing parameters $\lambda$, compute and plot the generalized cross validation measure $GCV(\lambda)$ and find the optimal smoothing parameter.
+
+https://stat.ethz.ch/R-manual/R-devel/library/stats/html/smooth.spline.html
+
+## B
+Using the Demmler-Reinsch basis representation, how many basis functions contribute significantly to the fit, as determined, for instance, by accumulating $90\%$ of the total degrees of freedom?
+
+https://statisticaloddsandends.wordpress.com/2019/10/04/the-demmler-reinsch-basis-for-smoothing-splines/

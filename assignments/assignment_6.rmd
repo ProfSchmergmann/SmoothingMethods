@@ -20,9 +20,45 @@ library(splines)
 ## A
 For a reasonable range of smoothing parameters $\lambda$, compute and plot the generalized cross validation measure $GCV(\lambda)$ and find the optimal smoothing parameter.
 
-https://stat.ethz.ch/R-manual/R-devel/library/stats/html/smooth.spline.html
+```{r, out.width = "50%", out.height = "50%"}
+with(mcycle, {
+  lambda <- seq(10^(-6), 10^(-3), by = 10^(-6))
+
+  smoothing <- function(l, x, y) {
+    return(smooth.spline(x, y, lambda = l)$cv.crit)
+  }
+
+  gcv <- sapply(lambda, smoothing, x = accel, y = times)
+  tmp <- data.frame(lambda = lambda, gcv = gcv)
+  lambda_opt <<- tmp[which.min(tmp$gcv),]$lambda
+  plot(tmp, type = 'l')
+  plot.new()
+  plot(times, accel, main = paste('min_lambda =', lambda_opt))
+  lines(smooth.spline(x = times, y = accel, lambda = lambda_opt), col = 'red', type = 'l')
+})
+```
 
 ## B
 Using the Demmler-Reinsch basis representation, how many basis functions contribute significantly to the fit, as determined, for instance, by accumulating $90\%$ of the total degrees of freedom?
 
 https://statisticaloddsandends.wordpress.com/2019/10/04/the-demmler-reinsch-basis-for-smoothing-splines/
+```{r}
+library(eBsc)
+with(mcycle, {
+  degrees_of_freedom <- smooth.spline(accel, times, lambda = lambda_opt)$df
+  basis <- drbasis(nn = length(accel), qq = 3)
+  pca <- prcomp(basis$eigenvectors)
+  # summary(pca)
+  with(basis, {
+    times <- as.matrix(times)
+    print(dim(eigenvalues))
+    print(dim(t(eigenvectors) %*% times))
+    print(dim(t(eigenvectors)))
+    print(t(eigenvalues) %*% (eigenvectors %*% times))
+    # sum(t(eigenvalues) %*%
+    #       (eigenvectors %*% times) *
+    #       eigenvectors)
+    # print(eigenvectors)
+  })
+})
+```

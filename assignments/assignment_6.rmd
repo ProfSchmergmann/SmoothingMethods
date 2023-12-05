@@ -15,6 +15,7 @@ The goal of this problem is to estimate the regression function of acceleration 
 ```{r}
 library(MASS)
 library(splines)
+library(splines2)
 ```
 
 ## A
@@ -43,22 +44,18 @@ Using the Demmler-Reinsch basis representation, how many basis functions contrib
 
 https://statisticaloddsandends.wordpress.com/2019/10/04/the-demmler-reinsch-basis-for-smoothing-splines/
 ```{r}
-library(eBsc)
 with(mcycle, {
-  degrees_of_freedom <- smooth.spline(accel, times, lambda = lambda_opt)$df
-  basis <- drbasis(nn = length(accel), qq = 3)
-  pca <- prcomp(basis$eigenvectors)
-  # summary(pca)
-  with(basis, {
-    times <- as.matrix(times)
-    print(dim(eigenvalues))
-    print(dim(t(eigenvectors) %*% times))
-    print(dim(t(eigenvectors)))
-    print(t(eigenvalues) %*% (eigenvectors %*% times))
-    # sum(t(eigenvalues) %*%
-    #       (eigenvectors %*% times) *
-    #       eigenvectors)
-    # print(eigenvectors)
-  })
+  knots <- times
+  Phi <- bSpline(times, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, length(knots)))
+  t <- seq(0, 1, length.out = 500)
+  delta <- t[2] - t[1]
+  Phi2 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, length(knots)), derivs = 2)
+  Omega <- delta * t(Phi2) %*% Phi2
+  H <- Phi %*% solve(t(Phi) %*% Phi + lambda_opt * Omega, t(Phi))
+  trace <- sum(diag(H))
+  GCV <- sum((y - H %*% y)^2) / (1 - mean(diag(H)))^2
+  print(GCV)
+  V <- eigen(t(Phi) %*% Phi)$vectors
+  D2 <- eigen(t(Phi) %*% Phi)$values
 })
 ```

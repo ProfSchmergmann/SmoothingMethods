@@ -58,3 +58,13 @@ plot(x, y)
 c <- solve(t(Phi) %*% Phi + lmd * Omega, t(Phi) %*% y)
 lines(t, Phi0 %*% c, col = 'red')
 ```
+# CH 15 Bootstrap and permutation tests.
+
+```{r}
+x <- runif(n = 4, 0, 1)
+z <- mean(x) - 1 / 2
+z <- replicate(1000, { x <- runif(n = 4, 0, 1); mean(x) - 1 / 2 })
+hist(z)
+q <- quantile(z, probs = c(.025, .975))
+print(q)
+```

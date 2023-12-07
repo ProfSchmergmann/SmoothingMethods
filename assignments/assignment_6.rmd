@@ -44,18 +44,56 @@ Using the Demmler-Reinsch basis representation, how many basis functions contrib
 
 https://statisticaloddsandends.wordpress.com/2019/10/04/the-demmler-reinsch-basis-for-smoothing-splines/
 ```{r}
+data(mcycle)
+knots <- mcycle$times[3:131]
+length(knots)
+upper <- ceiling(max(mcycle$times))
+Phi <- bSpline(mcycle$times, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, upper))
+out <- svd(Phi)
+D <- diag(out$d)
+V <- out$v
+R <- D%*%t(V)
+delta <- t[2] - t[1]
+t <- seq(0, upper, length.out = 200)
+Phi2 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, upper), derivs = 2)
+Omega <- delta * t(Phi2) %*% Phi2
+Phi0 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, upper))
+#H <- Phi %*% ginv(t(Phi) %*% Phi + lambda_opt * Omega)
+#sum(diag(H))
+
+
+```
+```{r}
+Sigma <- ginv(t(R)) %*% Omega %*% solve(V)
+S <- eigen(Sigma)$values
+U <- eigen(Sigma)$vectors
+Psi <- Phi %*% ginv(R) %*% U
+Psi0 <- Phi0 %*% ginv(R) %*% U
+plot(t,Psi0[,133],type="l")
+
+
+
+```
+
+```{r}
+plot(1:133,1/(1+0*S))
+plot(1:133,1/(1+lambda_opt*S))
+sum(1/(1+lambda_opt*S))
+```
+```{r}
 with(mcycle, {
   knots <- times
-  Phi <- bSpline(times, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, length(knots)))
-  t <- seq(0, 1, length.out = 500)
+  t <- seq(0, ceiling(max(knots)), length.out = 500)
+  Phi <- bSpline(times, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, ceiling(max(knots))))
   delta <- t[2] - t[1]
-  Phi2 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, length(knots)), derivs = 2)
+  Phi2 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, ceiling(max(knots))), derivs = 2)
   Omega <- delta * t(Phi2) %*% Phi2
-  H <- Phi %*% solve(t(Phi) %*% Phi + lambda_opt * Omega, t(Phi))
+  temp <- t(Phi) %*% Phi + lambda_opt * Omega
+  H <<- Phi %*% ginv(t(Phi) %*% Phi + lambda_opt * Omega)
   trace <- sum(diag(H))
-  GCV <- sum((y - H %*% y)^2) / (1 - mean(diag(H)))^2
-  print(GCV)
   V <- eigen(t(Phi) %*% Phi)$vectors
   D2 <- eigen(t(Phi) %*% Phi)$values
+
 })
+
 ```

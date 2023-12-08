@@ -12,27 +12,36 @@ opts_chunk$set(tidy.opts = list(width.cutoff = 80), tidy = TRUE)
 # 1
 The goal of this problem is to estimate the regression function of acceleration vs time for the `mcycle` data in the package `MASS`, using cubic smoothing splines.
 
-```{r}
+```{r, warning = F, results="hide"}
 library(MASS)
 library(splines)
 library(splines2)
+library(dplyr)
 ```
 
 ## A
 For a reasonable range of smoothing parameters $\lambda$, compute and plot the generalized cross validation measure $GCV(\lambda)$ and find the optimal smoothing parameter.
 
 ```{r, out.width = "50%", out.height = "50%"}
+lambda_gcv_df <- function(data) {
+  with(data, {
+    lambda <- seq(10^(-6), 10^(-3), by = 10^(-6))
+
+    smoothing <- function(l, x, y) {
+      return(smooth.spline(x, y, lambda = l)$cv.crit)
+    }
+
+    gcv <- sapply(lambda, smoothing, x = accel, y = times)
+    return(data.frame(lambda = lambda, gcv = gcv))
+  })
+}
+```
+```{r}
+data(mcycle)
 with(mcycle, {
-  lambda <- seq(10^(-6), 10^(-3), by = 10^(-6))
-
-  smoothing <- function(l, x, y) {
-    return(smooth.spline(x, y, lambda = l)$cv.crit)
-  }
-
-  gcv <- sapply(lambda, smoothing, x = accel, y = times)
-  tmp <- data.frame(lambda = lambda, gcv = gcv)
-  lambda_opt <<- tmp[which.min(tmp$gcv),]$lambda
-  plot(tmp, type = 'l')
+  lambda_gcv_df_a <- lambda_gcv_df(mcycle)
+  lambda_opt <- lambda_gcv_df_a[which.min(lambda_gcv_df_a$gcv),]$lambda
+  plot(lambda_gcv_df_a, type = 'l')
   plot.new()
   plot(times, accel, main = paste('min_lambda =', lambda_opt))
   lines(smooth.spline(x = times, y = accel, lambda = lambda_opt), col = 'red', type = 'l')
@@ -42,58 +51,69 @@ with(mcycle, {
 ## B
 Using the Demmler-Reinsch basis representation, how many basis functions contribute significantly to the fit, as determined, for instance, by accumulating $90\%$ of the total degrees of freedom?
 
-https://statisticaloddsandends.wordpress.com/2019/10/04/the-demmler-reinsch-basis-for-smoothing-splines/
-```{r}
-data(mcycle)
-knots <- mcycle$times[3:131]
-length(knots)
-upper <- ceiling(max(mcycle$times))
-Phi <- bSpline(mcycle$times, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, upper))
-out <- svd(Phi)
-D <- diag(out$d)
-V <- out$v
-R <- D%*%t(V)
-delta <- t[2] - t[1]
-t <- seq(0, upper, length.out = 200)
-Phi2 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, upper), derivs = 2)
-Omega <- delta * t(Phi2) %*% Phi2
-Phi0 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, upper))
-#H <- Phi %*% ginv(t(Phi) %*% Phi + lambda_opt * Omega)
-#sum(diag(H))
-
-
-```
-```{r}
-Sigma <- ginv(t(R)) %*% Omega %*% solve(V)
-S <- eigen(Sigma)$values
-U <- eigen(Sigma)$vectors
-Psi <- Phi %*% ginv(R) %*% U
-Psi0 <- Phi0 %*% ginv(R) %*% U
-plot(t,Psi0[,133],type="l")
-
-
-
-```
-
-```{r}
-plot(1:133,1/(1+0*S))
-plot(1:133,1/(1+lambda_opt*S))
-sum(1/(1+lambda_opt*S))
-```
+First, we averaged over the accel values when there were the same times values. We did that because otherwise we could not perform Cholesky decomposition because of a singularity issue. When we tried doing SVD we had issues with imaginary values.
 ```{r}
 with(mcycle, {
-  knots <- times
-  t <- seq(0, ceiling(max(knots)), length.out = 500)
-  Phi <- bSpline(times, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, ceiling(max(knots))))
-  delta <- t[2] - t[1]
-  Phi2 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, ceiling(max(knots))), derivs = 2)
-  Omega <- delta * t(Phi2) %*% Phi2
-  temp <- t(Phi) %*% Phi + lambda_opt * Omega
-  H <<- Phi %*% ginv(t(Phi) %*% Phi + lambda_opt * Omega)
-  trace <- sum(diag(H))
-  V <- eigen(t(Phi) %*% Phi)$vectors
-  D2 <- eigen(t(Phi) %*% Phi)$values
-
+  df <- data.frame(times = times, accel = accel)
+  df$times <- as.character(df$times)
+  df_grouped_times <- df %>%
+    group_by(times) %>%
+    summarise(accel = mean(accel))
+  df_grouped_times$times <- as.numeric(df_grouped_times$times)
+  df_grouped_times <<- df_grouped_times[order(df_grouped_times$times),]
 })
-
+```
+Now we went on computing the Demmler-Reinsch basis representation.
+```{r}
+with(df_grouped_times, {
+  # cut two values at the ends for the knots
+  knots <- times[3:92]
+  upper <- ceiling(max(times))
+  Phi <- bSpline(times, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, upper))
+  R <- chol(t(Phi) %*% Phi)
+  t <- seq(0, upper, length.out = 200)
+  delta <- t[2] - t[1]
+  Phi2 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, upper), derivs = 2)
+  Omega <- delta * t(Phi2) %*% Phi2
+  Phi0 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, upper))
+  Sigma <- solve(t(R)) %*% Omega %*% solve(R)
+  S <<- eigen(Sigma)$values
+  U <- eigen(Sigma)$vectors
+  Psi <- Phi %*% solve(R) %*% U
+  Psi0 <- Phi0 %*% solve(R) %*% U
+})
+```
+We calculate lambda optimal again because we averaged some numbers in the dataset as described above.
+```{r}
+lambda_gcv_df_a <- lambda_gcv_df(df_grouped_times)
+lambda_opt <- lambda_gcv_df_a[which.min(lambda_gcv_df_a$gcv),]$lambda
+cat('lambda_opt = ', lambda_opt)
+```
+In the following, we tried to compute the basis functions with lambda_opt which we calculated above but that gave strange values and a strange plot. So we decided to use $10^{-1}$ for lambda because then we are getting more reasonable values.
+```{r}
+x_lambda_opt <- rev(1 / (1 + lambda_opt * S))
+degrees_of_freedom_lambda_opt <- sum(x_lambda_opt)
+cat('degrees of freedom with lambda =', lambda_opt, ':', degrees_of_freedom_lambda_opt)
+```
+```{r}
+lmd <- 10^(-1)
+x <- rev(1 / (1 + lmd * S))
+degrees_of_freedom <- sum(x)
+cat('degrees of freedom with lambda =', lmd, ':', degrees_of_freedom)
+```
+```{r}
+idx_lambda_opt <- length(which(cumsum(x_lambda_opt) < 0.9 * degrees_of_freedom_lambda_opt))
+cat('We need', idx_lambda_opt, 'basis functions for lambda =', lambda_opt)
+cat('Now we have', sum(x[1:idx_lambda_opt]), 'degrees of freedom for lambda =', lambda_opt)
+```
+```{r}
+idx <- length(which(cumsum(x) < 0.9 * degrees_of_freedom))
+cat('We need', idx, 'basis functions for lambda = ', lmd)
+cat('Now we have', sum(x[1:idx]), 'degrees of freedom for lambda = ', lmd)
+```
+```{r}
+plot(seq_along(df_grouped_times$times), rev(x), main = paste('lambda =', lmd))
+```
+```{r}
+plot(seq_along(df_grouped_times$times), rev(x_lambda_opt), main = paste('lambda =', lambda_opt))
 ```

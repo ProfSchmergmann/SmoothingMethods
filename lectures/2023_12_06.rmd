@@ -1,0 +1,70 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: December 06, 2023
+output: pdf_document
+---
+```{r}
+library(splines2)
+```
+```{r}
+m <- function(x) sin(4 * pi * x)
+ep <- rnorm(50, mean = 0, sd = .3)
+x <- sort(runif(50))
+y <- m(x) + ep
+plot(x, y, pch = 16)
+knots <- x[3:48]
+Phi <- bSpline(x, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1))
+R <- chol(t(Phi) %*% Phi)
+t <- seq(0, 1, length.out = 500)
+delta <- t[2] - t[1]
+Phi2 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1), derivs = 2)
+Omega <- delta * t(Phi2) %*% Phi2
+lmd <- 10^(-5)
+H <- Phi %*% solve(t(Phi) %*% Phi + lmd * Omega, t(Phi))
+degrees_of_freedom <- sum(diag(H))
+y_hat <- H %*% y
+c <- solve(t(Phi) %*% Phi + lmd * Omega, t(Phi) %*% y)
+lines(x, y_hat, col = 'red')
+
+Phi0 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1))
+lines(t, Phi0 %*% c, col = 'blue')
+```
+```{r}
+Sigma <- solve(t(R)) %*% Omega %*% solve(R)
+S <- eigen(Sigma)$values
+U <- eigen(Sigma)$vectors
+plot(1:50, S)
+```
+
+```{r}
+Psi <- Phi %*% solve(R) %*% U
+Psi0 <- Phi0 %*% solve(R) %*% U
+plot(t, Psi0[, 50], type = 'l')
+for (i in 49:46) {
+  lines(t, Psi0[, i], type = 'l')
+}
+```
+```{r}
+plot(1:50, 1 / (1 + 0 * S))
+```
+```{r}
+plot(1:50, 1 / (1 + 10^(-7) * S))
+```
+```{r}
+lmd <- 10^(-3)
+H <- Phi %*% solve(t(Phi) %*% Phi + lmd * Omega, t(Phi))
+plot(x, y)
+c <- solve(t(Phi) %*% Phi + lmd * Omega, t(Phi) %*% y)
+lines(t, Phi0 %*% c, col = 'red')
+```
+# CH 15 Bootstrap and permutation tests.
+
+```{r}
+x <- runif(n = 4, 0, 1)
+z <- mean(x) - 1 / 2
+z <- replicate(1000, { x <- runif(n = 4, 0, 1); mean(x) - 1 / 2 })
+hist(z)
+q <- quantile(z, probs = c(.025, .975))
+print(q)
+```

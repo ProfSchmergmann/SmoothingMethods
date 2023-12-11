@@ -1,0 +1,49 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: December 04, 2023
+output: pdf_document
+---
+```{r}
+library(splines2)
+```
+```{r}
+knots <- c(.3, .5, .8)
+t <- seq(0, 1, length.out = 200)
+Phi <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1))
+matplot(t, Phi, type = 'l', lwd = 2)
+Phi2 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1), derivs = 2)
+matplot(t, Phi2, type = 'l', lwd = 2)
+delta <- t[2] - t[1]
+Omega <- delta * t(Phi2) %*% Phi2
+```
+```{r}
+m <- function(x) sin(4 * pi * x)
+ep <- rnorm(50, mean = 0, sd = .3)
+x <- sort(sort(runif(50)))
+y <- m(x) + ep
+plot(x, y, pch = 16)
+knots <- x
+Phi <- bSpline(x, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1))
+t <- seq(0, 1, length.out = 500)
+delta <- t[2] - t[1]
+Phi2 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1), derivs = 2)
+Omega <- delta * t(Phi2) %*% Phi2
+lmd <- 10^(-5)
+c <- solve(t(Phi) %*% Phi + lmd * Omega, t(Phi) %*% y)
+Phi0 <- bSpline(t, knots = knots, degree = 3, intercept = T, Boundary.knots = c(0, 1))
+lines(t, Phi0 %*% c)
+```
+```{r}
+H <- Phi %*% solve(t(Phi) %*% Phi + lmd * Omega, t(Phi))
+trace <- sum(diag(H))
+GCV <- sum((y - H %*% y)^2) / (1 - mean(diag(H)))^2
+```
+```{r}
+R <- chol(t(Phi)%*%Phi)
+```
+```{r}
+V <- eigen(t(Phi)%*%Phi)$vectors
+D2 <- eigen(t(Phi)%*%Phi)$values
+
+```

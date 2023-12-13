@@ -1,0 +1,40 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: December 11, 2023
+output: pdf_document
+---
+```{r}
+x <- runif(4, -1, 1)
+x_boot <- expand.grid(x, x, x, x)
+theta_hat_boot <- apply(x_boot, 1, mean)
+hist(theta_hat_boot)
+T_star <- theta_hat_boot - mean(x)
+plot.new()
+hist(T_star)
+print(quantile(T_star, probs = c(.025, .975)))
+```
+```{r}
+x <- runif(10, -1, 1)
+theta_hat <- mean(x)
+T_star <- replicate(n = 10000, { x_star <- sample(x, size = length(x), replace = T); theta_hat_star <- mean(x_star); T_star <- theta_hat_star - theta_hat })
+hist(T_star)
+quantile(T_star, probs = c(0.025, 0.975))
+```
+```{r}
+x <- c(.032, .034, .214, .263, .275, .275, .45, .5, .5, .63, .8, .9, .9, .9, .9, 1.0, 1.1, 1.1, 1.4, 1.7, 2.0, 2.0, 2.0, 2.0)
+y <- c(170, 290, -130, -70, -185, -220, 200, 290, 270, 200, 300, -30, 650, 150, 500, 920, 450, 500, 500, 960, 500, 850, 800, 1090)
+plot(x, y)
+rho_hat <- cor(x, y)
+
+T_star <- replicate(10000, {
+  i_boot <- sample(seq_along(x), size = length(x), replace = T)
+  x_boot <- x[i_boot]
+  y_boot <- y[i_boot]
+  rho_hat_star <- cor(x_boot, y_boot)
+  T_star <- rho_hat_star - rho_hat
+})
+plot.new()
+hist(T_star)
+quantile(T_star, probs = c(0.025, 0.975))
+```

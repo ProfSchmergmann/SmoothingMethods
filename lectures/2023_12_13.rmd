@@ -1,0 +1,55 @@
+---
+title: "MTHSTAT 869"
+author: Sven Bergmann
+date: December 06, 2023
+output: pdf_document
+---
+```{r}
+n <- 20
+ep <- rnorm(n, sd = .5)
+x <- rep(0, n)
+x[1] <- ep[1]
+for (i in 2:n) { x[i] <- .9 * x[i - 1] + ep[i] }
+plot(1:n, x, type = 'b')
+```
+```{r}
+T_obs <- mean(x[2:n] - mean(x)) * (x[1:n - 1] - mean(x))
+x_perm <- sample(x, size = n, replace = F)
+T_perm <- mean(x_perm[2:n] - mean(x_perm)) * (x_perm[1:n - 1] - mean(x_perm))
+```
+```{r}
+T_perm <- replicate(10000, { x_perm <- sample(x, size = n, replace = F); mean(x_perm[2:n] - mean(x_perm)) * (x_perm[1:n - 1] - mean(x_perm)) })
+hist(T_perm)
+```
+```{r}
+p_value <- 2 * (mean(T_perm) > abs(T_obs))
+```
+```{r}
+x <- c(5.9, 6.8, 6.4, 7.0, 6.6, 7.7, 7.2, 6.9, 6.2)
+y <- c(5.3, 5.6, 5.5, 5.1, 6.2, 5.8, 5.8)
+T_obs <- mean(x) - mean(y)
+n1 <- length(x)
+n2 <- length(y)
+T_perm <- replicate(10000, {
+  z_perm <- sample(c(x, y), size = n1 + n2, replace = F)
+  x_perm <- z_perm[1:n1]
+  y_perm <- z_perm[(n1 + 1):(n1 + n2)]
+  mean(x_perm) - mean(y_perm)
+})
+hist(T_perm)
+p_value <- 2 * mean((T_perm > abs(T_obs)))
+```
+```{r}
+library(MASS)
+data(Animals)
+x <- log(Animals$body)
+y <- log(Animals$brain)
+plot(x, y)
+```
+```{r}
+T_perm <- replicate(10000, {
+  y_perm <- sample(y, size = length(y), replace = F)
+  lm(y ~ x, data = data.frame(x = x, y = y_perm))$coefficients[2]
+})
+hist(T_perm)
+```

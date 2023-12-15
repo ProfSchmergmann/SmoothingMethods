@@ -9,61 +9,53 @@ latex_engine: xelatex
 library(knitr)
 opts_chunk$set(tidy.opts = list(width.cutoff = 80), tidy = TRUE)
 ```
-
-
 # Chapter 15
 
-# Problem 3
+## Problem 3
 
 Refer to insect waiting times for the female Western White Clematis
 in Table 10.1. Use the percentile method to find a $90%$ confidence interval
 for $F(30$), the probability that the waiting time is less than or equal
 to $30$ minutes.
 
-Table 10.1:
+### Table 10.1
+Waiting times for insects to visit flowers.
 
-Table 10.1 Waiting times for insects to visit flowers.
-Male flowers Female flowers
-1 9 27 1 19 57
-1 9 27 2 23 59
-2 9 30 4 23 67
-2 11 31 4 26 71
-4 11 35 5 28 75
-4 14 36 6 29 75a)
-5 14 40 7 29 78a)
-5 14 43 7 29 81
-6 16 54 8 30 90a)
-6 16 61 8 32 94a)
-6 17 68 8 35 96
-7 17 69 9 35 96a)
-7 18 70 14 37 100a)
-8 19 83 15 39 102a)
-8 19 95 18 43 105a)
-8 19 102a) 18 56
-104a)
-a) Waiting times for insects to visit flowers. Right censoring
-indicated by *.
+| Male  flowers |   |    |     | Female  flowers |    |    |     |
+|---------------|---|----|-----|-----------------|----|----|-----|
+|               | 1 | 9  | 27  |                 | 1  | 19 | 57  |
+|               | 1 | 9  | 27  |                 | 2  | 23 | 59  |
+|               | 2 | 9  | 30  |                 | 4  | 23 | 67  |
+|               | 2 | 11 | 31  |                 | 4  | 26 | 71  |
+|               | 4 | 11 | 35  |                 | 5  | 28 | 75  |
+|               | 4 | 14 | 36  |                 | 6  | 29 | 75  |
+|               | 5 | 14 | 40  |                 | 7  | 29 | 78  |
+|               | 5 | 14 | 43  |                 | 7  | 29 | 81  |
+|               | 6 | 16 | 54  |                 | 8  | 30 | 90  |
+|               | 6 | 16 | 61  |                 | 8  | 32 | 94  |
+|               | 6 | 17 | 68  |                 | 8  | 35 | 96  |
+|               | 7 | 17 | 69  |                 | 9  | 35 | 96  |
+|               | 7 | 18 | 70  |                 | 14 | 37 | 100 |
+|               | 8 | 19 | 83  |                 | 15 | 39 | 102 |
+|               | 8 | 19 | 95  |                 | 18 | 43 | 105 |
+|               | 8 | 19 | 102 |                 | 18 | 56 |     |
+|               |   |    | 104 |                 |    |    |     |
+
 ```{r}
-male <- c(1,1,2,2,4,4,5,5,6,6,6,7,7,8,8,8,
-9,9,9,11,11,14,14,14,16,16,17,17,18,19,19,19,
-27,27,30,31,35,36,40,43,54,61,68,69,70,83,95,102,104)
-male.event <- c(rep(1,47),0,0)
-# denoting '1' if failure, denoting '0' if censored.
+library(survival)
+female <- c(1, 2, 4, 4, 5, 6, 7, 7, 8, 8, 8, 9, 14, 15, 18, 18, 19, 23, 23, 26, 28, 29, 29, 29, 30, 32, 35, 35, 37, 39, 43, 56, 57, 59, 67, 71, 75, 75, 78, 81, 90, 94, 96, 96, 100, 102, 105)
+female.event <- c(rep(1, 32), 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0)
 
-female <- c(1,2,4,4,5,6,7,7,8,8,8,9,14,15,18,18,
-19,23,23,26,28,29,29,29,30,32,35,35,37,39,43,56,
-57,59,67,71,75,75,78,81,90,94,96,96,100,102,105);
-female.event <- c(rep(1,32),1,1,1,1,1,0,0,1,0,0,1,0,0,0,0)
-
-male <- male[male.event!=0]
-female <- female[female.event!=0]
-
-
-
+T_i <- replicate(10000, {
+  idx_boot <- sample(seq_along(female), size = length(female), replace = T)
+  x_boot <- female[idx_boot]
+  female.event.boot <- female.event[idx_boot]
+  kmest <- (1 - survfit(Surv(x_boot, event = female.event.boot, type = "right") ~ 1, type = "kaplan-meier")$surv)
+  kmest[sum(30.0 >= x_boot)]
+})
+quantile(T_i, probs = c(.05, .95), na.rm = T)
 ```
-
-
-# Problem 7
+## Problem 7
 
 Seven patients each underwent three different methods of kidney dialysis.
 The following values were obtained for weight change in kilograms
@@ -83,61 +75,71 @@ Test the null hypothesis that there is no difference in mean weight change
 among treatments. Use properly designed permutation test.
 
 ```{r}
-x <- c(2.90,2.56,2.88,2.73,2.50,3.18,2.83)
-y <- c(2.97,2.45,2.76,2.20,2.16,2.89,2.87)
-z <- c(2.67,2.62,1.84,2.33,1.27,2.39,2.39)
-T_obs <- mean(x) - mean(y) + mean(x)- mean(z)
+x <- c(2.90, 2.56, 2.88, 2.73, 2.50, 3.18, 2.83)
+y <- c(2.97, 2.45, 2.76, 2.20, 2.16, 2.89, 2.87)
+z <- c(2.67, 2.62, 1.84, 2.33, 1.27, 2.39, 2.39)
+T_obs <- mean(x) - mean(y) + mean(x) - mean(z)
 T_obs
 n1 <- length(x)
 n2 <- length(y)
 n3 <- length(z)
-T_perm <- replicate(10000,{
-  z_perm <- sample(c(x,y,z),size=n1+n2+n3,replace = F)
-x_perm <- z_perm[1:n1]
-y_perm <- z_perm[(n1+1):(n1+n2)]
-z_perm <- z_perm[(n1+n2+1):(n1+n2+n3)]
-  mean(x_perm) - mean(y_perm) + mean(x_perm)- mean(z_perm)
+T_perm <- replicate(10000, {
+  z_perm <- sample(c(x, y, z), size = n1 + n2 + n3, replace = F)
+  x_perm <- z_perm[1:n1]
+  y_perm <- z_perm[(n1 + 1):(n1 + n2)]
+  z_perm <- z_perm[(n1 + n2 + 1):(n1 + n2 + n3)]
+  mean(x_perm) - mean(y_perm) + mean(x_perm) - mean(z_perm)
 })
 
 mean(T_perm > T_obs)
 
 
 ```
-
 We reject $H_0$ since the $p$-value is very small.
 
-# Problem 10
+## Problem 10
 
-Return to Example 7.5 in which tread wear for tires is measured using
-weight loss and groove wear. Construct a randomization test to compute
-the significance of the Pearson correlation coefficient. How does this
-value compare with the $p$-value in the R function cor.test?
+Return to Example 7.5 in which tread wear for tires is measured using weight loss and groove wear.
+Construct a randomization test to compute the significance of the Pearson correlation coefficient.
+How does this value compare with the $p$-value in the R function `cor.test`?
 
 
-Example 7.5 Stichler, Richey, and Mandel (1953) list tread wear for tires (see
-table below), each tire measured by two methods based on (i) weight loss and (ii)
-groove wear. In R, the function
-cor(x,y,method="spearman")
-computes the Spearman coefficient. For this example, ̂ρ = 0.9265. Note that if we
-opt for the parametric measure of correlation, the Pearson coefficient is 0.948:
-Weight Groove Weight Groove
-45.9 35.7 41.9 39.2
-37.5 31.1 33.4 28.1
-31.0 24.0 30.5 28.7
-30.9 25.9 31.9 23.3
-30.4 23.1 27.3 23.7
-20.4 20.9 24.5 16.1
-20.9 19.9 18.9 15.2
-13.7 11.5 11.4 11.2
+### Example 7.5
+Stichler, Richey, and Mandel (1953) list tread wear for tires (see table below), each tire measured by two methods based on (i) weight loss and (ii) groove wear.
+In R, the function `cor(x,y,method="spearman")` computes the Spearman coefficient.
+For this example, $\hat{\rho} = 0.9265$.
+Note that if we opt for the parametric measure of correlation, the Pearson coefficient is 0.948:
+
+| Weight | Groove | Weight | Groove |
+|--------|--------|--------|--------|
+| 45.9   | 35.7   | 41.9   | 39.2   |
+| 37.5   | 31.1   | 33.4   | 28.1   |
+| 31.0   | 24.0   | 30.5   | 28.7   |
+| 30.9   | 25.9   | 31.9   | 23.3   |
+| 30.4   | 23.1   | 27.3   | 23.7   |
+| 20.4   | 20.9   | 24.5   | 16.1   |
+| 20.9   | 19.9   | 18.9   | 15.2   |
+| 13.7   | 11.5   | 11.4   | 11.2   |
+
+```{r}
 weight <- c(45.9, 37.5, 31.0, 30.9, 30.4, 20.4, 20.9, 13.7,
-41.9, 33.4, 30.5, 31.9, 27.3, 24.5, 18.9, 11.4)
+            41.9, 33.4, 30.5, 31.9, 27.3, 24.5, 18.9, 11.4)
+
 groove <- c(35.7, 31.1, 24.0, 25.9, 23.1, 20.9, 19.9,
-11.5, 39.2, 28.1, 28.7, 23.3, 23.7, 16.1, 15.2,
-11.2)
+            11.5, 39.2, 28.1, 28.7, 23.3, 23.7, 16.1, 15.2,
+            11.2)
 
-cor(weight, groove, method="spearman")
+T_obs <- cor(weight, groove)
 
+T_i <- replicate(10000, {
+  X <- weight
+  Y <- sample(groove, length(groove), replace = FALSE)
+  cor(X, Y)
+})
 
+p_value <- mean(T_i > T_obs)
 
+p_value_of_r_test <- cor.test(x = weight, y = groove)$p.value
 
-
+cat('Difference between our p_value', p_value, 'and the p_value from the test in R', p_value_of_r_test, ':', abs(p_value - p_value_of_r_test))
+```

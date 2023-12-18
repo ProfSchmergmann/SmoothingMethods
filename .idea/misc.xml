@@ -2,6 +2,7 @@
 <project version="4">
   <component name="Black">
     <option name="enabledOnReformat" value="true" />
+    <option name="sdkName" value="Python 3.10" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10" project-jdk-type="Python SDK" />
   <component name="RMarkdownSettings">
@@ -182,6 +183,7 @@
         <entry key="file://$PROJECT_DIR$/assignments/assignment_7.rmd">
           <value>
             <RMarkdownRenderProfile>
+              <option name="lastOutput" value="$PROJECT_DIR$/assignments/assignment_7.pdf" />
               <option name="outputDirectoryUrl" value="file://$PROJECT_DIR$/assignments" />
             </RMarkdownRenderProfile>
           </value>

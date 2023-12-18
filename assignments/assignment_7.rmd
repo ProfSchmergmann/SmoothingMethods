@@ -73,16 +73,29 @@ between dialysis sessions:
 
 Test the null hypothesis that there is no difference in mean weight change
 among treatments. Use properly designed permutation test.
+```{r}
+perm_pair <- function(vector_1, vector_2, reps = 10000) {
+  T_obs <- mean(vector_1) - mean(vector_2)
+  T_perm <- replicate(reps, {
+    sample_perm <- sample(c(vector_1, vector_2), size = length(vector_1) + length(vector_2), replace = F)
+    vector_2_perm <- sample_perm[(length(vector_1) + 1):(length(vector_1) + length(vector_2))]
+    vector_1_perm <- sample_perm[seq_along(vector_1)]
+    mean(vector_1_perm) - mean(vector_2_perm)
+  })
+  return(list(T_obs = T_obs, T_perm = T_perm, p_value = mean(T_perm > T_obs)))
+}
+```
 
 ```{r}
 x <- c(2.90, 2.56, 2.88, 2.73, 2.50, 3.18, 2.83)
 y <- c(2.97, 2.45, 2.76, 2.20, 2.16, 2.89, 2.87)
 z <- c(2.67, 2.62, 1.84, 2.33, 1.27, 2.39, 2.39)
+
 T_obs <- mean(x) - mean(y) + mean(x) - mean(z)
-T_obs
 n1 <- length(x)
 n2 <- length(y)
 n3 <- length(z)
+
 T_perm <- replicate(10000, {
   z_perm <- sample(c(x, y, z), size = n1 + n2 + n3, replace = F)
   x_perm <- z_perm[1:n1]
@@ -92,8 +105,11 @@ T_perm <- replicate(10000, {
 })
 
 mean(T_perm > T_obs)
-
-
+```
+```{r}
+cat('p-value for perm test between x and y:', perm_pair(x, y)$p_value)
+cat('p-value for perm test between x and z:', perm_pair(x, z)$p_value)
+cat('p-value for perm test between y and z:', perm_pair(y, z)$p_value)
 ```
 We reject $H_0$ since the $p$-value is very small.
 
